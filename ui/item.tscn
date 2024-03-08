@@ -1,0 +1,50 @@
+[gd_scene load_steps=7 format=3 uid="uid://cclrl4j8d6841"]
+
+[ext_resource type="Script" path="res://script/item.gd" id="1_0s3s3"]
+[ext_resource type="Texture2D" uid="uid://30d6k5h814jr" path="res://asset/item/panel.png" id="1_6twc2"]
+[ext_resource type="Texture2D" uid="uid://cd2pta6lawvid" path="res://asset/item/unpressed.png" id="2_blfhg"]
+[ext_resource type="PackedScene" uid="uid://dgqn43md56adx" path="res://ui/press_to_copy.tscn" id="3_i06bx"]
+[ext_resource type="Texture2D" uid="uid://bymqu2gdvu66u" path="res://asset/item/pressed.png" id="3_s3rpx"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_1howk"]
+texture = ExtResource("1_6twc2")
+region_rect = Rect2(512, 256, 16, 16)
+
+[node name="Item" type="Panel"]
+custom_minimum_size = Vector2(512, 256)
+offset_right = 512.0
+offset_bottom = 256.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_1howk")
+script = ExtResource("1_0s3s3")
+
+[node name="Head" type="HBoxContainer" parent="."]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+offset_right = 115.0
+offset_bottom = 31.0
+alignment = 1
+
+[node name="Title" parent="Head" instance=ExtResource("3_i06bx")]
+layout_mode = 2
+use_color_rect = true
+
+[node name="Unfold" type="TextureButton" parent="Head"]
+layout_mode = 2
+toggle_mode = true
+texture_normal = ExtResource("2_blfhg")
+texture_pressed = ExtResource("3_s3rpx")
+
+[node name="Edit" type="Button" parent="Head"]
+custom_minimum_size = Vector2(128, 64)
+layout_mode = 2
+text = "Edit"
+
+[node name="Body" type="VBoxContainer" parent="."]
+visible = false
+layout_mode = 2
+offset_top = 35.0
+offset_right = 115.0
+offset_bottom = 35.0
+
+[connection signal="toggled" from="Head/Unfold" to="." method="_on_unfold_toggled"]
+[connection signal="pressed" from="Head/Edit" to="." method="_on_edit_pressed"]

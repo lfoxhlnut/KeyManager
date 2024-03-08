@@ -1,0 +1,42 @@
+[gd_scene load_steps=2 format=3 uid="uid://o8uxe5sehgvf"]
+
+[ext_resource type="Script" path="res://script/edit_window.gd" id="1_2tqmw"]
+
+[node name="EditWindow" type="Panel"]
+custom_minimum_size = Vector2(512, 400)
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_2tqmw")
+
+[node name="Head" type="LineEdit" parent="."]
+layout_mode = 0
+offset_right = 67.0625
+offset_bottom = 31.0
+
+[node name="Body" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Body"]
+layout_mode = 2
+offset_top = 20.0
+offset_right = 40.0
+offset_bottom = 20.0
+
+[node name="Add" type="Button" parent="Body"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.835938
+anchor_top = 0.795367
+anchor_right = 0.912109
+anchor_bottom = 0.915058
+text = "Add"
+metadata/_edit_use_anchors_ = true
+
+[node name="Confirm" type="Button" parent="."]
+layout_mode = 0
+offset_left = 164.0
+offset_top = 331.0
+offset_right = 344.0
+offset_bottom = 378.0
+text = "Confirm"

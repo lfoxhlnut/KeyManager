@@ -1,0 +1,27 @@
+[gd_scene load_steps=2 format=3 uid="uid://dgqn43md56adx"]
+
+[ext_resource type="Script" path="res://script/press_to_copy.gd" id="1_43j4y"]
+
+[node name="PressToCopy" type="TextureButton"]
+custom_minimum_size = Vector2(64, 0)
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_43j4y")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+visible = false
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_right = 159.0
+offset_bottom = 23.0
+text = "content to be copied"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[connection signal="minimum_size_changed" from="." to="." method="_on_minimum_size_changed"]
+[connection signal="pressed" from="." to="." method="_on_pressed"]
