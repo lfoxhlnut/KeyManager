@@ -9,13 +9,16 @@ offset_bottom = 40.0
 script = ExtResource("1_2tqmw")
 
 [node name="Head" type="LineEdit" parent="."]
-layout_mode = 0
-offset_right = 67.0625
+layout_mode = 2
+offset_right = 512.0
 offset_bottom = 31.0
 
 [node name="Body" type="Control" parent="."]
-layout_mode = 1
+layout_mode = 2
 anchors_preset = 0
+offset_top = 35.0
+offset_right = 512.0
+offset_bottom = 35.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Body"]
 layout_mode = 2
@@ -34,9 +37,14 @@ text = "Add"
 metadata/_edit_use_anchors_ = true
 
 [node name="Confirm" type="Button" parent="."]
-layout_mode = 0
-offset_left = 164.0
-offset_top = 331.0
-offset_right = 344.0
-offset_bottom = 378.0
+layout_mode = 2
+anchor_left = 0.3125
+anchor_top = 0.78
+anchor_right = 0.603516
+anchor_bottom = 0.92
 text = "Confirm"
+metadata/_edit_use_anchors_ = true
+
+[connection signal="minimum_size_changed" from="Body/VBoxContainer" to="." method="_on_v_box_container_minimum_size_changed"]
+[connection signal="pressed" from="Body/Add" to="." method="_on_add_pressed"]
+[connection signal="pressed" from="Confirm" to="." method="_on_confirm_pressed"]

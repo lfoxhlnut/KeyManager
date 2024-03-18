@@ -11,3 +11,4 @@ var info: Array[String] = []:
 func _init(_title: String = "", _info: Array[String] = []) -> void:
 	title = _title
 	info = _info
+
