@@ -23,6 +23,7 @@ var info_num: int:
 		if not is_node_ready():
 			await ready
 		return vbox.get_child_count()
+var info_id: int
 
 
 func _ready() -> void:
@@ -39,13 +40,14 @@ func initialize() -> void:
 	
 	head.text = data.title
 	info_num = 0
+	info_id = 0
 	free_vbox()
 	
 	for i: String in data.info:
 		vbox.add_child(create_hbox(i))
 
 
-func create_hbox(content: String = "", id: int = info_num) -> HBoxContainer:
+func create_hbox(content: String = "") -> HBoxContainer:
 	var hbox := HBoxContainer.new()
 	hbox.alignment = BoxContainer.ALIGNMENT_CENTER
 	hbox.custom_minimum_size.x = vbox.custom_minimum_size.x
@@ -55,7 +57,8 @@ func create_hbox(content: String = "", id: int = info_num) -> HBoxContainer:
 	line_edit.add_to_group(GROUP_NAME)	# 需要保证同时只有一个 edit window 在运行才会正常
 	line_edit.anchor_left = 0
 	line_edit.text = content
-	line_edit.id = id
+	line_edit.id = info_id
+	info_id += 1
 	line_edit.custom_minimum_size.x = vbox.custom_minimum_size.x * 0.5
 	line_edit.size.y = 48
 	
