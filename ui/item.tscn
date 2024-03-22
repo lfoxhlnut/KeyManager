@@ -11,9 +11,9 @@ texture = ExtResource("1_6twc2")
 region_rect = Rect2(512, 256, 16, 16)
 
 [node name="Item" type="Panel"]
-custom_minimum_size = Vector2(512, 256)
 offset_right = 512.0
 offset_bottom = 256.0
+mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxTexture_1howk")
 script = ExtResource("1_0s3s3")
 
@@ -22,6 +22,7 @@ custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
 offset_right = 115.0
 offset_bottom = 31.0
+mouse_filter = 2
 alignment = 1
 
 [node name="Title" parent="Head" instance=ExtResource("3_i06bx")]
@@ -46,5 +47,7 @@ offset_top = 35.0
 offset_right = 115.0
 offset_bottom = 35.0
 
+[connection signal="resized" from="Head" to="." method="_on_head_or_body_resized"]
 [connection signal="toggled" from="Head/Unfold" to="." method="_on_unfold_toggled"]
 [connection signal="pressed" from="Head/Edit" to="." method="_on_edit_pressed"]
+[connection signal="resized" from="Body" to="." method="_on_head_or_body_resized"]

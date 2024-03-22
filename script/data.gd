@@ -12,3 +12,6 @@ func _init(_title: String = "", _info: Array[String] = []) -> void:
 	title = _title
 	info = _info
 
+
+func _to_string() -> String:
+	return "%s`%s" % [title, info]

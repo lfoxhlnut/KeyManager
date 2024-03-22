@@ -1,20 +1,31 @@
-[gd_scene load_steps=2 format=3 uid="uid://o8uxe5sehgvf"]
+[gd_scene load_steps=4 format=3 uid="uid://o8uxe5sehgvf"]
 
 [ext_resource type="Script" path="res://script/edit_window.gd" id="1_2tqmw"]
+[ext_resource type="Texture2D" uid="uid://30d6k5h814jr" path="res://asset/item/panel.png" id="1_o0tyx"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_b5y6q"]
+texture = ExtResource("1_o0tyx")
 
 [node name="EditWindow" type="Panel"]
-custom_minimum_size = Vector2(512, 400)
-offset_right = 40.0
-offset_bottom = 40.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -256.0
+offset_right = 256.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_b5y6q")
 script = ExtResource("1_2tqmw")
 
 [node name="Head" type="LineEdit" parent="."]
-layout_mode = 2
+layout_mode = 0
 offset_right = 512.0
 offset_bottom = 31.0
 
 [node name="Body" type="Control" parent="."]
-layout_mode = 2
+layout_mode = 3
 anchors_preset = 0
 offset_top = 35.0
 offset_right = 512.0
@@ -37,7 +48,8 @@ text = "Add"
 metadata/_edit_use_anchors_ = true
 
 [node name="Confirm" type="Button" parent="."]
-layout_mode = 2
+layout_mode = 1
+anchors_preset = -1
 anchor_left = 0.3125
 anchor_top = 0.78
 anchor_right = 0.603516

@@ -1,6 +1,7 @@
 extends Panel
 
-signal confirmed(data: Data)
+signal confirmed(_data: Data)
+
 
 const GROUP_NAME := "ew_body_le"
 
@@ -11,7 +12,6 @@ var data := Data.new():
 		data.title = v.title
 		data.info = v.info
 		initialize()
-
 
 @onready var head: LineEdit = $Head
 @onready var body: Control = $Body
@@ -31,7 +31,7 @@ func _ready() -> void:
 	head.size.y = 64
 	vbox.custom_minimum_size.x = size.x
 	body.position.y = 64 + 16
-	data = Data.new("title ff", ["info1", "info3", "fffff中文ffffff"])
+	#data = Data.new("title ff", ["info1", "info3", "fffff中文ffffff"])
 
 
 func initialize() -> void:
@@ -150,4 +150,5 @@ func _on_add_pressed() -> void:
 func _on_v_box_container_minimum_size_changed() -> void:
 	body.size.x = vbox.custom_minimum_size.x
 	body.size.y = vbox.custom_minimum_size.y + 128
+	@warning_ignore("narrowing_conversion")
 	size.y = body.size.y + 128
