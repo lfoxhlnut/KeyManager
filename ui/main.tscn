@@ -16,6 +16,7 @@ offset_bottom = 40.0
 script = ExtResource("2_1nopt")
 
 [node name="Title" type="TabBar" parent="Content"]
+layout_mode = 0
 offset_right = 255.0
 offset_bottom = 49.0
 
