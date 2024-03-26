@@ -1,6 +1,7 @@
 class_name Data
 extends RefCounted
 
+# title 和 info 里就不能出现反引号了
 const delimiter = "`"
 
 var title: String
@@ -16,7 +17,7 @@ func _init(_title: String = "", _info: Array[String] = []) -> void:
 
 
 func _to_string() -> String:
-	return "%s`%s" % [title, "`".join(info)]
+	return "%s%s%s" % [title, delimiter, delimiter.join(info)]
 
 
 func from_string(s: String) -> void:

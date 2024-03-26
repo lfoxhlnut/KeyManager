@@ -1,6 +1,8 @@
 class_name Item
 extends Panel
 
+signal data_modified
+
 const PressToCopyTscn := preload("res://ui/press_to_copy.tscn")
 const EditWindowTscn := preload("res://ui/edit_window.tscn")
 
@@ -28,6 +30,8 @@ func _ready() -> void:
 
 
 func initialize() -> void:
+	if not is_node_ready():
+		await ready
 	title.text = data.title
 	
 	free_body()
@@ -73,6 +77,7 @@ func _on_edit_pressed() -> void:
 		data = _data
 		ew.queue_free()
 		Global.get_hud().exclusive_mouse = false
+		data_modified.emit()
 	)
 	Global.get_hud().add_child(ew)
 	Global.get_hud().exclusive_mouse = true

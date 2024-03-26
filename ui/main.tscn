@@ -1,6 +1,5 @@
-[gd_scene load_steps=5 format=3 uid="uid://cg54ffl27sd7c"]
+[gd_scene load_steps=4 format=3 uid="uid://cg54ffl27sd7c"]
 
-[ext_resource type="PackedScene" uid="uid://b8efvjfwe815r" path="res://ui/test.tscn" id="1_1pe1d"]
 [ext_resource type="Script" path="res://script/main.gd" id="1_sfe7e"]
 [ext_resource type="Script" path="res://script/Content.gd" id="2_1nopt"]
 [ext_resource type="PackedScene" uid="uid://k5r1oyboiqjk" path="res://ui/hud.tscn" id="3_tn6l6"]
@@ -10,21 +9,31 @@ script = ExtResource("1_sfe7e")
 
 [node name="Content" type="Control" parent="."]
 layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("2_1nopt")
 
 [node name="Title" type="TabBar" parent="Content"]
-layout_mode = 0
-offset_right = 255.0
-offset_bottom = 49.0
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+tab_alignment = 1
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Content"]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+layout_mode = 1
 
-[node name="Test" parent="." instance=ExtResource("1_1pe1d")]
+[node name="Save" type="Button" parent="Content"]
+layout_mode = 0
+offset_right = 8.0
+offset_bottom = 8.0
 
 [node name="HUD" parent="." instance=ExtResource("3_tn6l6")]
+
+[connection signal="resized" from="Content/Title" to="Content" method="_on_title_resized"]
+[connection signal="tab_changed" from="Content/Title" to="Content" method="_on_title_tab_changed"]
+[connection signal="pressed" from="Content/Save" to="Content" method="_on_save_pressed"]
