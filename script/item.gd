@@ -82,6 +82,7 @@ func _on_edit_pressed() -> void:
 	Global.get_hud().add_child(ew)
 	Global.get_hud().exclusive_mouse = true
 
+
 func _on_head_or_body_resized() -> void:
 	if not is_node_ready():
 		await ready
@@ -89,6 +90,10 @@ func _on_head_or_body_resized() -> void:
 	# 再者, 用 size 的话, 如果写 custom_minimum_size.y = size.y, 那就二者不会再变小
 	if body.visible:
 		custom_minimum_size.x = maxf(head.size.x, body.size.x)
-		custom_minimum_size.y = head.size.y + body.size.y
+		
+		# head 和 body 之间可能有空隙, 不能直接用 head.size.y + body.size.y
+		# BUG: 然而似乎视觉上还是有些小错误, 再说吧
+		custom_minimum_size.y = (body.position.y - head.position.y) + body.size.y
 	else:
 		custom_minimum_size.y = head.size.y
+	

@@ -118,13 +118,14 @@ func _exit_tree() -> void:
 
 
 func _on_confirm_pressed() -> void:
+	data.title = head.text
 	data.info = []
 	for i: MyLineEdit in get_lines():
 		if i.text != "":
 			data.info.append(i.text)
 	
 	if Global.DEBUG:
-		print("confirmed data:\n\ttitle: [%s]\ncontent: [%s]" % [data.title, data.info])
+		print("confirmed data:\n\ttitle: [%s]\n\tcontent: [%s]" % [data.title, data.info])
 	confirmed.emit(data)
 
 

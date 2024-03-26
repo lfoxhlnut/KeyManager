@@ -26,6 +26,7 @@ func _ready() -> void:
 		],
 	}
 	v_box.position.x = 0.5 * size.x
+	
 	pass
 
 
@@ -49,16 +50,16 @@ func _on_title_resized() -> void:
 func _on_title_tab_changed(tab: int) -> void:
 	free_vbox_children()
 	var key: String = title.get_tab_title(title.current_tab)
-	for i: Data in data_dict[key]:
+	for id: int in data_dict[key].size():
 		var item: Item = ItemTscn.instantiate()
 		v_box.add_child(item)
 		item.resized.connect(func():
 			v_box.position.x = 0.5 * size.x - 0.5 * item.size.x
 		)
 		item.data_modified.connect(func():
-			data_dict[key] = item.data
+			data_dict[key][id] = item.data
 		)
-		item.data = i
+		item.data = data_dict[key][id]
 		# 真奇怪, 无论怎么设置 vbox 的 pos 都没用, remote 检查器里的数据和
 		# print 打印出来的数据不一样, 必须手动点击一下展开, vbox 的位置才是正确的
 		item._on_unfold_toggled(true)
@@ -72,6 +73,9 @@ func free_vbox_children() -> void:
 
 
 func _on_save_pressed() -> void:
-	pass # Replace with function body.
+	print_debug("ready to save:", data_dict)
+	Global.save(data_dict)
 
 
+func _on_reload_pressed() -> void:
+	data_dict = Global.load_save()

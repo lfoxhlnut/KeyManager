@@ -20,9 +20,10 @@ func _to_string() -> String:
 	return "%s%s%s" % [title, delimiter, delimiter.join(info)]
 
 
-func from_string(s: String) -> void:
+static func from_string(s: String) -> Data:
 	var pieces := s.split(delimiter)
-	title = pieces[0]
-	info.clear()
-	for i: int in range(2, pieces.size()):
-		info.append(pieces[i])
+	var _title: String = pieces[0]
+	var _info: Array[String] = []
+	for i: int in range(1, pieces.size()):
+		_info.append(pieces[i])
+	return Data.new(_title, _info)

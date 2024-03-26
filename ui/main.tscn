@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://cg54ffl27sd7c"]
 
 [ext_resource type="Script" path="res://script/main.gd" id="1_sfe7e"]
-[ext_resource type="Script" path="res://script/Content.gd" id="2_1nopt"]
+[ext_resource type="Script" path="res://script/content.gd" id="2_gs1wt"]
 [ext_resource type="PackedScene" uid="uid://k5r1oyboiqjk" path="res://ui/hud.tscn" id="3_tn6l6"]
 
 [node name="Main" type="Node"]
@@ -14,7 +14,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("2_1nopt")
+script = ExtResource("2_gs1wt")
 
 [node name="Title" type="TabBar" parent="Content"]
 custom_minimum_size = Vector2(0, 64)
@@ -29,11 +29,26 @@ layout_mode = 1
 
 [node name="Save" type="Button" parent="Content"]
 layout_mode = 0
-offset_right = 8.0
-offset_bottom = 8.0
+anchor_left = 0.821296
+anchor_top = 0.795313
+anchor_right = 0.948148
+anchor_bottom = 0.892187
+text = "Save"
+metadata/_edit_use_anchors_ = true
+
+[node name="Reload" type="Button" parent="Content"]
+layout_mode = 0
+anchor_left = 0.811111
+anchor_top = 0.2
+anchor_right = 0.961111
+anchor_bottom = 0.315625
+text = "Reload
+"
+metadata/_edit_use_anchors_ = true
 
 [node name="HUD" parent="." instance=ExtResource("3_tn6l6")]
 
 [connection signal="resized" from="Content/Title" to="Content" method="_on_title_resized"]
 [connection signal="tab_changed" from="Content/Title" to="Content" method="_on_title_tab_changed"]
 [connection signal="pressed" from="Content/Save" to="Content" method="_on_save_pressed"]
+[connection signal="pressed" from="Content/Reload" to="Content" method="_on_reload_pressed"]
