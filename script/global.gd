@@ -44,19 +44,22 @@ print(typeof(decoded["class1"]))	# Array
 print(decoded["class1"][0] is String)	# true
 """
 
-func save(data_dict := {}) -> void:
-	var save_file := FileAccess.open_encrypted_with_pass(SAVE_PATH, FileAccess.WRITE, SAVE_KEY)
+func save(data_dict: Dictionary, passwd: String) -> void:
+	var save_file := FileAccess.open_encrypted_with_pass(SAVE_PATH, FileAccess.WRITE, passwd)
 	if save_file == null:
 		print_debug("存档失败, 错误代码 %s" % FileAccess.get_open_error())
+		return
 	save_file.store_pascal_string(JSON.stringify(data_dict))
 	save_file.close()
 
 
-func load_save() -> Dictionary:
+func load_save(passwd: String) -> Dictionary:
+	print_debug("load pswd:", passwd)
 	var res := {}
-	var save_file := FileAccess.open_encrypted_with_pass(SAVE_PATH, FileAccess.READ, SAVE_KEY)
+	var save_file := FileAccess.open_encrypted_with_pass(SAVE_PATH, FileAccess.READ, passwd)
 	if save_file == null:
 		print_debug("读取失败, 错误代码 %s" % FileAccess.get_open_error())
+		return {}
 	var t: Dictionary = JSON.parse_string(save_file.get_pascal_string())
 	print_debug("\n\n what is read:", t)
 	for key: String in t:

@@ -2,6 +2,7 @@ extends Control
 
 const ItemTscn := preload("res://ui/item.tscn")
 const EditWindowTscn = preload("res://ui/edit_window.tscn")
+const InfoInputTscn = preload("res://ui/info_input.tscn")
 
 var data_dict: Dictionary = {}:
 	set(v):
@@ -75,16 +76,40 @@ func free_vbox_children() -> void:
 
 
 func _on_save_pressed() -> void:
-	print_debug("ready to save:", data_dict)
-	Global.save(data_dict)
+	#print_debug("ready to save:", data_dict)
+	Global.save(data_dict, await get_save_key())
+
+
+var _save_key: String
+func get_save_key() -> String:
+	var info_input: InfoInput = InfoInputTscn.instantiate()
+	# TODO: hud 遮罩不能设为无色透明, 不然 info input 太不明显
+	info_input.global_position = Vector2(300, 400)
+	
+	# NOTE: gdscript 里没有函数闭包, 不能访问函数的局部变量
+	# 但是 info_input.queue_free() 这句是有用的
+	info_input.confirmed.connect(func(text: String):
+		_save_key = text
+		info_input.queue_free()
+		Global.get_hud().exclusive_mouse = false
+	)
+	Global.get_hud().add_child(info_input)
+	Global.get_hud().exclusive_mouse = true
+	await info_input.confirmed
+	return _save_key
 
 
 func _on_reload_pressed() -> void:
-	# BUG: 现在 reload 之后 data.info 为空的 item 展开后也会显示 item.body
-	data_dict = Global.load_save()
+	var res := Global.load_save(await get_save_key())
+	if res == {}:
+		# TODO: 添加提示等
+		print_debug("no save or password err")
+	else:
+		data_dict = res
 
 
-# _on_add_pressed 和 _on_add_class_pressed 都源自 item.gd 中一个函数, 可考虑封装
+# _on_add_pressed 和 _on_add_class_pressed 都源自 item.gd 中一个函数,
+# 可考虑封装, 就像 get_save_key 一样, 用 await
 func _on_add_pressed() -> void:
 	var ew: EditWindow = EditWindowTscn.instantiate()
 	

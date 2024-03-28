@@ -1,0 +1,30 @@
+[gd_scene load_steps=2 format=3 uid="uid://ccy8chdl8u2ad"]
+
+[ext_resource type="Script" path="res://script/info_input.gd" id="1_iiibg"]
+
+[node name="InfoInput" type="Panel"]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_iiibg")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+offset_right = 367.0
+offset_bottom = 40.0
+
+[node name="LineEdit" type="LineEdit" parent="HBoxContainer"]
+custom_minimum_size = Vector2(256, 0)
+layout_mode = 2
+placeholder_text = "input info here"
+alignment = 1
+
+[node name="Delimiter" type="Control" parent="HBoxContainer"]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+
+[node name="Confirm" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+text = "Confirm"
+
+[connection signal="resized" from="HBoxContainer" to="." method="_on_h_box_container_resized"]
+[connection signal="pressed" from="HBoxContainer/Confirm" to="." method="_on_confirm_pressed"]
