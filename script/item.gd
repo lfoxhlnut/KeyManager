@@ -66,7 +66,7 @@ func _on_unfold_toggled(toggled_on: bool) -> void:
 
 
 func _on_edit_pressed() -> void:
-	var ew := EditWindowTscn.instantiate()
+	var ew: EditWindow = EditWindowTscn.instantiate()
 	ew.data = data
 	
 	ew.resized.connect(func():

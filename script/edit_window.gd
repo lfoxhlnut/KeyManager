@@ -1,3 +1,4 @@
+class_name EditWindow
 extends Panel
 
 signal confirmed(_data: Data)

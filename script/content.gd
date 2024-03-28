@@ -1,6 +1,7 @@
 extends Control
 
 const ItemTscn := preload("res://ui/item.tscn")
+const EditWindowTscn = preload("res://ui/edit_window.tscn")
 
 var data_dict: Dictionary = {}:
 	set(v):
@@ -16,7 +17,8 @@ func _ready() -> void:
 	data_dict = {
 		"class1": [
 			Data.new("title1", ["fff", "11中文"]),
-			Data.new("222", ["password", "11中文"]),
+			#Data.new("222", ["password", "11中文"]),
+			Data.new("222", []),
 			Data.new("3", ["password", "11中文"]),
 		],
 		"kirov reporting": [
@@ -78,4 +80,48 @@ func _on_save_pressed() -> void:
 
 
 func _on_reload_pressed() -> void:
+	# BUG: 现在 reload 之后 data.info 为空的 item 展开后也会显示 item.body
 	data_dict = Global.load_save()
+
+
+# _on_add_pressed 和 _on_add_class_pressed 都源自 item.gd 中一个函数, 可考虑封装
+func _on_add_pressed() -> void:
+	var ew: EditWindow = EditWindowTscn.instantiate()
+	
+	ew.resized.connect(func():
+		ew.global_position = 0.5 * Global.WIN_SIZE - 0.5 * ew.size
+	)
+	
+	ew.confirmed.connect(func(_data: Data):
+		var key := title.get_tab_title(title.current_tab)
+		(data_dict[key] as Array).append(_data)
+		_on_title_tab_changed(title.current_tab)
+		
+		ew.queue_free()
+		Global.get_hud().exclusive_mouse = false
+	)
+	Global.get_hud().add_child(ew)
+	Global.get_hud().exclusive_mouse = true
+
+
+func _on_add_class_pressed() -> void:
+	var ew: EditWindow = EditWindowTscn.instantiate()
+	
+	ew.resized.connect(func():
+		ew.global_position = 0.5 * Global.WIN_SIZE - 0.5 * ew.size
+	)
+	
+	ew.confirmed.connect(func(_data: Data):
+		if not data_dict.has(_data.title):
+			title.add_tab(_data.title)
+			data_dict[_data.title] = []
+		for i: String in _data.info:
+			(data_dict[_data.title] as Array).append(Data.new(i))
+		
+		initialize()	# 只设置 data_dict 的一个键, 会触发 setter 吗
+		
+		ew.queue_free()
+		Global.get_hud().exclusive_mouse = false
+	)
+	Global.get_hud().add_child(ew)
+	Global.get_hud().exclusive_mouse = true

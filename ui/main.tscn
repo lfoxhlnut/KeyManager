@@ -46,9 +46,33 @@ text = "Reload
 "
 metadata/_edit_use_anchors_ = true
 
+[node name="AddClass" type="Button" parent="Content"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.836111
+anchor_top = 0.4375
+anchor_right = 0.927778
+anchor_bottom = 0.523438
+offset_left = 6.10352e-05
+text = "AddClass"
+metadata/_edit_use_anchors_ = true
+
+[node name="Add" type="Button" parent="Content"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.834259
+anchor_top = 0.626562
+anchor_right = 0.925926
+anchor_bottom = 0.7125
+offset_left = 6.10352e-05
+text = "Add"
+metadata/_edit_use_anchors_ = true
+
 [node name="HUD" parent="." instance=ExtResource("3_tn6l6")]
 
 [connection signal="resized" from="Content/Title" to="Content" method="_on_title_resized"]
 [connection signal="tab_changed" from="Content/Title" to="Content" method="_on_title_tab_changed"]
 [connection signal="pressed" from="Content/Save" to="Content" method="_on_save_pressed"]
 [connection signal="pressed" from="Content/Reload" to="Content" method="_on_reload_pressed"]
+[connection signal="pressed" from="Content/AddClass" to="Content" method="_on_add_class_pressed"]
+[connection signal="pressed" from="Content/Add" to="Content" method="_on_add_pressed"]
