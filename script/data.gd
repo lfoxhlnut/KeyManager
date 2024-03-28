@@ -17,7 +17,10 @@ func _init(_title: String = "", _info: Array[String] = []) -> void:
 
 
 func _to_string() -> String:
-	return "%s%s%s" % [title, delimiter, delimiter.join(info)]
+	var info_str := ""
+	if info.size() > 0:
+		info_str = "%s%s" % [delimiter, delimiter.join(info)]
+	return title + info_str
 
 
 static func from_string(s: String) -> Data:
