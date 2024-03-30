@@ -8,9 +8,9 @@ var data_dict: Dictionary = {}:
 	set(v):
 		data_dict = v.duplicate()
 		initialize()
-
+@onready var menu: Menu = Global.get_hud().get_node("Menu")	# TODO: 由于把 menu 分离开了, 需要设置信号以通信, 暂先这样写着
 @onready var title: TabBar = $Title
-# TODO: 添加滚动条
+# TODO: 添加滚动条 # 似乎官方组件有考虑到这一点
 @onready var v_box: VBoxContainer = $VBoxContainer
 
 
@@ -50,7 +50,7 @@ func _on_title_resized() -> void:
 	v_box.position.y = title.size.y + 64
 
 
-func _on_title_tab_changed(tab: int) -> void:
+func _on_title_tab_changed(_tab: int) -> void:
 	free_vbox_children()
 	var key: String = title.get_tab_title(title.current_tab)
 	for id: int in data_dict[key].size():
@@ -77,7 +77,7 @@ func free_vbox_children() -> void:
 
 func _on_save_pressed() -> void:
 	#print_debug("ready to save:", data_dict)
-	Global.save(data_dict, await get_save_key())
+	Global.save(data_dict, await get_save_key(), menu.save_path)
 
 
 var _save_key: String
@@ -99,8 +99,8 @@ func get_save_key() -> String:
 	return _save_key
 
 
-func _on_reload_pressed() -> void:
-	var res := Global.load_save(await get_save_key())
+func _on_load_pressed() -> void:
+	var res := Global.load_save(await get_save_key(), menu.save_path)
 	if res == {}:
 		# TODO: 添加提示等
 		print_debug("no save or password err")

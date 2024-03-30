@@ -2,10 +2,19 @@ class_name InfoInput
 extends Panel
 
 signal confirmed(text: String)
+
+@export var placeholder_text := "input info here":
+	set(v):
+		placeholder_text = v
+		if not is_node_ready():
+			await ready
+		line_edit.placeholder_text = v
+
+
 @onready var hbox: HBoxContainer = $HBoxContainer
 @onready var line_edit: LineEdit = $HBoxContainer/LineEdit
 
-# TODO: 提示词和背景色放到检查器里
+# TODO: 背景色放到检查器里
 
 func _on_confirm_pressed() -> void:
 	print_debug("line edit text is ", line_edit.text)

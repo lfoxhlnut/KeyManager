@@ -14,8 +14,8 @@ const WIN_WIDTH = 1080
 const WIN_HEIGHT = 640
 const WIN_SIZE = Vector2(WIN_WIDTH, WIN_HEIGHT)
 
-const SAVE_PATH = "res://tmp_save.txt"
-const SAVE_KEY = "222"
+const DEFAULT_SAVE_PATH = "user://"
+const DEFAULT_SAVE_FILENAME = "save.dat"
 
 func _ready() -> void:
 	pass
@@ -44,33 +44,33 @@ print(typeof(decoded["class1"]))	# Array
 print(decoded["class1"][0] is String)	# true
 """
 
-func save(data_dict: Dictionary, passwd: String) -> void:
-	var save_file := FileAccess.open_encrypted_with_pass(SAVE_PATH, FileAccess.WRITE, passwd)
+func save(data_dict: Dictionary, passwd: String, save_path: String) -> void:
+	var save_file := FileAccess.open_encrypted_with_pass(save_path.path_join(DEFAULT_SAVE_FILENAME), FileAccess.WRITE, passwd)
 	if save_file == null:
-		print_debug("存档失败, 错误代码 %s" % FileAccess.get_open_error())
+		print_debug("Fail to save. Error code is %s" % FileAccess.get_open_error())
 		return
 	save_file.store_pascal_string(JSON.stringify(data_dict))
 	save_file.close()
 
 
-func load_save(passwd: String) -> Dictionary:
+func load_save(passwd: String, save_path: String) -> Dictionary:
 	print_debug("load pswd:", passwd)
 	var res := {}
-	var save_file := FileAccess.open_encrypted_with_pass(SAVE_PATH, FileAccess.READ, passwd)
+	var save_file := FileAccess.open_encrypted_with_pass(save_path.path_join(DEFAULT_SAVE_FILENAME), FileAccess.READ, passwd)
 	if save_file == null:
-		print_debug("读取失败, 错误代码 %s" % FileAccess.get_open_error())
+		print_debug("Fail to load save file. Error code is %s" % FileAccess.get_open_error())
 		return {}
 	var t: Dictionary = JSON.parse_string(save_file.get_pascal_string())
-	print_debug("\n\n what is read:", t)
+	#print_debug("\n\n what is read:", t)
 	for key: String in t:
 		var data_arr: Array[Data] = []
-		print_debug("\n\n t[%s] is %s" % [key, t[key]])
+		#print_debug("\n\n t[%s] is %s" % [key, t[key]])
 		if t[key] is String:
 			t[key] = [t[key]]
 		for i: String in t[key]:
 			data_arr.append(Data.from_string(i))
 			assert(data_arr[-1] is Data)
-		print_debug("\n\n what is converted:", data_arr)
+		#print_debug("\n\n what is converted:", data_arr)
 		res[key] = data_arr.duplicate()
 	
 	save_file.close()
