@@ -1,3 +1,4 @@
+class_name Content
 extends Control
 
 const ItemTscn := preload("res://ui/item.tscn")
@@ -59,6 +60,8 @@ func _on_title_tab_changed(_tab: int) -> void:
 		item.resized.connect(func():
 			v_box.position.x = 0.5 * size.x - 0.5 * item.size.x
 		)
+		# NOTE: gdscript 里没有函数闭包, 不能访问函数的局部变量
+		# 但是 局部节点变量的 queue_free() 是有用的, 全局变量或说类的成员也是可以访问的
 		item.data_modified.connect(func():
 			data_dict[key][id] = item.data
 		)
@@ -67,7 +70,6 @@ func _on_title_tab_changed(_tab: int) -> void:
 		# print 打印出来的数据不一样, 必须手动点击一下展开, vbox 的位置才是正确的
 		item._on_unfold_toggled(true)
 		item._on_unfold_toggled(false)
-	
 
 
 func free_vbox_children() -> void:
@@ -75,78 +77,17 @@ func free_vbox_children() -> void:
 		i.queue_free()
 
 
-func _on_save_pressed() -> void:
-	#print_debug("ready to save:", data_dict)
-	Global.save(data_dict, await get_save_key(), menu.save_path)
+func add_item(data: Data) -> void:
+	var key := title.get_tab_title(title.current_tab)
+	(data_dict[key] as Array).append(data)
+	_on_title_tab_changed(title.current_tab)
 
 
-var _save_key: String
-func get_save_key() -> String:
-	var info_input: InfoInput = InfoInputTscn.instantiate()
-	# TODO: hud 遮罩不能设为无色透明, 不然 info input 太不明显
-	info_input.global_position = Vector2(300, 400)
+func add_class(data: Data) -> void:
+	if not data_dict.has(data.title):
+		title.add_tab(data.title)
+		data_dict[data.title] = []
+	for i: String in data.info:
+		(data_dict[data.title] as Array).append(Data.new(i))
 	
-	# NOTE: gdscript 里没有函数闭包, 不能访问函数的局部变量
-	# 但是 info_input.queue_free() 这句是有用的
-	info_input.confirmed.connect(func(text: String):
-		_save_key = text
-		info_input.queue_free()
-		Global.get_hud().exclusive_mouse = false
-	)
-	Global.get_hud().add_child(info_input)
-	Global.get_hud().exclusive_mouse = true
-	await info_input.confirmed
-	return _save_key
-
-
-func _on_load_pressed() -> void:
-	var res := Global.load_save(await get_save_key(), menu.save_path)
-	if res == {}:
-		# TODO: 添加提示等
-		print_debug("no save or password err")
-	else:
-		data_dict = res
-
-
-# _on_add_pressed 和 _on_add_class_pressed 都源自 item.gd 中一个函数,
-# 可考虑封装, 就像 get_save_key 一样, 用 await
-func _on_add_pressed() -> void:
-	var ew: EditWindow = EditWindowTscn.instantiate()
-	
-	ew.resized.connect(func():
-		ew.global_position = 0.5 * Global.WIN_SIZE - 0.5 * ew.size
-	)
-	
-	ew.confirmed.connect(func(_data: Data):
-		var key := title.get_tab_title(title.current_tab)
-		(data_dict[key] as Array).append(_data)
-		_on_title_tab_changed(title.current_tab)
-		
-		ew.queue_free()
-		Global.get_hud().exclusive_mouse = false
-	)
-	Global.get_hud().add_child(ew)
-	Global.get_hud().exclusive_mouse = true
-
-
-func _on_add_class_pressed() -> void:
-	var ew: EditWindow = EditWindowTscn.instantiate()
-	
-	ew.resized.connect(func():
-		ew.global_position = 0.5 * Global.WIN_SIZE - 0.5 * ew.size
-	)
-	
-	ew.confirmed.connect(func(_data: Data):
-		if not data_dict.has(_data.title):
-			title.add_tab(_data.title)
-			data_dict[_data.title] = []
-		for i: String in _data.info:
-			(data_dict[_data.title] as Array).append(Data.new(i))
-		
-		initialize()	# 只设置 data_dict 的一个键, 会触发 setter 吗
-		
-		ew.queue_free()
-		Global.get_hud().exclusive_mouse = false
-	)
-	Global.get_hud().add_child(ew)
-	Global.get_hud().exclusive_mouse = true
+	initialize()	# 只设置 data_dict 的一个键, 会触发 setter 吗
