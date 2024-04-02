@@ -8,6 +8,7 @@ signal add_class_pressed(data: Data)
 signal add_pressed(data: Data)
 
 const EditWindowTscn = preload("res://ui/edit_window.tscn")
+const CONFIG_SECTION_NAME = "menu"
 
 @onready var hbox: HBoxContainer = $HBoxContainer
 @onready var save: Button = $HBoxContainer/Save
@@ -27,9 +28,28 @@ func _ready() -> void:
 	for i: Control in hbox.get_children():
 		i.custom_minimum_size.x = 128
 	
+	@warning_ignore("narrowing_conversion")
 	file_dialog.size.x = 0.75 * size.x
+	@warning_ignore("narrowing_conversion")
 	file_dialog.size.y = 0.4 * size.x	# 这里用的是 size.x, 只能保证 menu 的宽度和屏幕一样
 	file_dialog.position = 0.5 * (Global.WIN_SIZE - (file_dialog.size as Vector2))	# 居中
+
+	load_config()
+
+
+func load_config() -> void:
+	if not Global.config.has_section(CONFIG_SECTION_NAME):
+		return
+	
+	save_path = Global.config.get_value(CONFIG_SECTION_NAME, "save_path", Global.DEFAULT_SAVE_PATH)
+
+
+func _exit_tree() -> void:
+	save_config()
+
+
+func save_config() -> void:
+	Global.config.set_value(CONFIG_SECTION_NAME, "save_path", save_path)
 
 
 func _on_edit_save_path_pressed() -> void:
@@ -79,10 +99,10 @@ func get_save_key() -> String:
 	# TODO: hud 遮罩不能设为无色透明, 不然 info input 太不明显
 	info_input.placeholder_text = "Input secret key here"
 	info_input.show()
-	hud.add_child(info_input)
 	hud.exclusive_mouse = true
 	
 	var save_key: String = await info_input.confirmed
 	info_input.hide()
+	# TODO: 重置 info input 的输入信息
 	hud.exclusive_mouse = false
 	return save_key

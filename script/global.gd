@@ -16,13 +16,25 @@ const WIN_SIZE = Vector2(WIN_WIDTH, WIN_HEIGHT)
 
 const DEFAULT_SAVE_PATH = "user://"
 const DEFAULT_SAVE_FILENAME = "save.dat"
+const DEFAULT_CONFIG_FILENAME = "config.cfg"
+var _config_path := DEFAULT_SAVE_PATH.path_join(DEFAULT_CONFIG_FILENAME)
+@onready var config := ConfigFile.new()
+
 
 func _ready() -> void:
-	pass
+	var err := config.load(_config_path)
+
+	if err != OK:
+		print_debug("fail to load config file. err code: ", err)
+
+
+func _exit_tree() -> void:
+	save_config()
 
 
 func get_hud() -> HUD:
 	return get_node("../Main/HUD") as HUD
+
 
 """
 data_dict = {
@@ -44,13 +56,17 @@ print(typeof(decoded["class1"]))	# Array
 print(decoded["class1"][0] is String)	# true
 """
 
-func save(data_dict: Dictionary, passwd: String, save_path: String) -> void:
+func save_data(data_dict: Dictionary, passwd: String, save_path: String) -> void:
 	var save_file := FileAccess.open_encrypted_with_pass(save_path.path_join(DEFAULT_SAVE_FILENAME), FileAccess.WRITE, passwd)
 	if save_file == null:
 		print_debug("Fail to save. Error code is %s" % FileAccess.get_open_error())
 		return
 	save_file.store_pascal_string(JSON.stringify(data_dict))
 	save_file.close()
+
+
+func save_config(path: String = _config_path) -> void:
+	config.save(path)
 
 
 func load_save(passwd: String, save_path: String) -> Dictionary:

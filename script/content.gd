@@ -9,7 +9,6 @@ var data_dict: Dictionary = {}:
 	set(v):
 		data_dict = v.duplicate()
 		initialize()
-@onready var menu: Menu = Global.get_hud().get_node("Menu")	# TODO: 由于把 menu 分离开了, 需要设置信号以通信, 暂先这样写着
 @onready var title: TabBar = $Title
 # TODO: 添加滚动条 # 似乎官方组件有考虑到这一点
 @onready var v_box: VBoxContainer = $VBoxContainer
