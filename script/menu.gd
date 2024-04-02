@@ -1,21 +1,38 @@
 class_name Menu
-extends Control
-# 这个菜单功能太少了, 很简单, 就不用官方组件了吧
+extends MenuBar
 
 signal save_pressed
 signal load_pressed
-signal add_class_pressed(data: Data)
-signal add_pressed(data: Data)
+signal item_add_pressed(data: Data)
+signal item_manage_pressed
+signal class_add_pressed(data: Data)
+signal class_manage_pressed
 
 const EditWindowTscn = preload("res://ui/edit_window.tscn")
 const CONFIG_SECTION_NAME = "menu"
+enum SaveOp {
+	SAVE, LOAD, EDIT_PATH, OPEN_PATH
+}
+const SaveOpText = [
+	"Save",
+	"Load",
+	"Edit save path",
+	"Open save path",
+]
+enum  ItemOp { ADD, MANAGE }
+const ItemOpText = [
+	"Add item",
+	"Manage items",
+]
+enum  ClassOp { ADD, MANAGE }
+const ClassOpText = [
+	"Add class",
+	"Manage classes"
+]
+@onready var save_operation: PopupMenu = $"Save Operation"
+@onready var item_operation: PopupMenu = $"Item Operation"
+@onready var class_operation: PopupMenu = $"Class Operation"
 
-@onready var hbox: HBoxContainer = $HBoxContainer
-@onready var save: Button = $HBoxContainer/Save
-@onready var load_btn: Button = $HBoxContainer/Load
-@onready var add_class: Button = $HBoxContainer/AddClass
-@onready var add: Button = $HBoxContainer/Add
-@onready var edit_save_path: Button = $HBoxContainer/EditSavePath
 @onready var info_input: InfoInput = $InfoInput
 @onready var file_dialog: FileDialog = $FileDialog
 @onready var hud: HUD = $".."
@@ -24,17 +41,23 @@ var save_path: String = Global.DEFAULT_SAVE_PATH
 
 
 func _ready() -> void:
-	hbox.size = size
-	for i: Control in hbox.get_children():
-		i.custom_minimum_size.x = 128
-	
 	@warning_ignore("narrowing_conversion")
 	file_dialog.size.x = 0.75 * size.x
 	@warning_ignore("narrowing_conversion")
 	file_dialog.size.y = 0.4 * size.x	# 这里用的是 size.x, 只能保证 menu 的宽度和屏幕一样
 	file_dialog.position = 0.5 * (Global.WIN_SIZE - (file_dialog.size as Vector2))	# 居中
-
+	
+	set_popup_menu_item_text()
 	load_config()
+
+
+func set_popup_menu_item_text() -> void:
+	for i: String in SaveOpText:
+		save_operation.add_item(i)
+	for i: String in ItemOpText:
+		item_operation.add_item(i)
+	for i: String in ClassOpText:
+		class_operation.add_item(i)
 
 
 func load_config() -> void:
@@ -53,7 +76,6 @@ func save_config() -> void:
 
 
 func _on_edit_save_path_pressed() -> void:
-	#info_input.placeholder_text = "Input new save path here(Leave blink as default: %s)" % [ProjectSettings.globalize_path(Global.DEFAULT_SAVE_PATH)]
 	file_dialog.current_dir = ProjectSettings.globalize_path(save_path)
 	file_dialog.show()
 	var s: String = await file_dialog.dir_selected
@@ -61,22 +83,6 @@ func _on_edit_save_path_pressed() -> void:
 		save_path = s
 	print_debug("save path selected: ", save_path)
 	file_dialog.hide()
-
-
-func _on_save_pressed() -> void:
-	save_pressed.emit()
-
-
-func _on_load_pressed() -> void:
-	load_pressed.emit()
-
-
-func _on_add_class_pressed() -> void:
-	add_class_pressed.emit(await get_data_from_ew())
-
-
-func _on_add_pressed() -> void:
-	add_pressed.emit(await get_data_from_ew())
 
 
 func get_data_from_ew() -> Data:
@@ -106,3 +112,37 @@ func get_save_key() -> String:
 	# TODO: 重置 info input 的输入信息
 	hud.exclusive_mouse = false
 	return save_key
+
+
+func _on_save_operation_index_pressed(index: int) -> void:
+	match index:
+		SaveOp.SAVE:
+			save_pressed.emit()
+		SaveOp.LOAD:
+			load_pressed.emit()
+		SaveOp.EDIT_PATH:
+			_on_edit_save_path_pressed()
+		SaveOp.OPEN_PATH:
+			print_debug("OPEN_PATH")
+		_:
+			print_debug("unexpected index: ", index)
+
+
+func _on_item_operation_index_pressed(index: int) -> void:
+	match index:
+		ItemOp.ADD:
+			item_add_pressed.emit(await get_data_from_ew())
+		ItemOp.MANAGE:
+			item_manage_pressed.emit()
+		_:
+			print_debug("unexpected index: ", index)
+
+
+func _on_class_operation_index_pressed(index: int) -> void:
+	match index:
+		ClassOp.ADD:
+			class_add_pressed.emit(await get_data_from_ew())
+		ClassOp.MANAGE:
+			class_manage_pressed.emit()
+		_:
+			print_debug("unexpected index: ", index)

@@ -105,7 +105,7 @@ func free_vbox_children() -> void:
 
 
 func add_item(data: Data) -> void:
-	var key := title.get_tab_title(title.current_tab)
+	var key := get_title_tab_text(title.current_tab)
 	(data_dict[key] as Array).append(data)
 	_on_title_tab_changed(title.current_tab)
 

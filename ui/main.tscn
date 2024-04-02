@@ -43,44 +43,18 @@ layout_mode = 2
 
 [node name="HUD" parent="." instance=ExtResource("3_tn6l6")]
 
-[node name="Menu" type="Control" parent="HUD"]
-layout_mode = 3
+[node name="Menu" type="MenuBar" parent="HUD"]
 anchors_preset = 10
 anchor_right = 1.0
 offset_bottom = 48.0
 grow_horizontal = 2
 script = ExtResource("3_rt524")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="HUD/Menu"]
-layout_mode = 2
-offset_right = 422.0
-offset_bottom = 31.0
+[node name="Save Operation" type="PopupMenu" parent="HUD/Menu"]
 
-[node name="Save" type="Button" parent="HUD/Menu/HBoxContainer"]
-layout_mode = 2
-text = "Save"
-metadata/_edit_use_anchors_ = true
+[node name="Item Operation" type="PopupMenu" parent="HUD/Menu"]
 
-[node name="Load" type="Button" parent="HUD/Menu/HBoxContainer"]
-layout_mode = 2
-text = "Load
-"
-metadata/_edit_use_anchors_ = true
-
-[node name="AddClass" type="Button" parent="HUD/Menu/HBoxContainer"]
-layout_mode = 2
-text = "AddClass"
-metadata/_edit_use_anchors_ = true
-
-[node name="Add" type="Button" parent="HUD/Menu/HBoxContainer"]
-custom_minimum_size = Vector2(128, 0)
-layout_mode = 2
-text = "Add"
-metadata/_edit_use_anchors_ = true
-
-[node name="EditSavePath" type="Button" parent="HUD/Menu/HBoxContainer"]
-layout_mode = 2
-text = "EditSavePath"
+[node name="Class Operation" type="PopupMenu" parent="HUD/Menu"]
 
 [node name="InfoInput" parent="HUD/Menu" instance=ExtResource("4_e5pcr")]
 visible = false
@@ -99,12 +73,10 @@ access = 2
 
 [connection signal="resized" from="Content/Title" to="Content" method="_on_title_resized"]
 [connection signal="tab_changed" from="Content/Title" to="Content" method="_on_title_tab_changed"]
-[connection signal="add_class_pressed" from="HUD/Menu" to="." method="_on_menu_add_class_pressed"]
-[connection signal="add_pressed" from="HUD/Menu" to="." method="_on_menu_add_pressed"]
+[connection signal="class_add_pressed" from="HUD/Menu" to="." method="_on_menu_class_add_pressed"]
+[connection signal="item_add_pressed" from="HUD/Menu" to="." method="_on_menu_item_add_pressed"]
 [connection signal="load_pressed" from="HUD/Menu" to="." method="_on_menu_load_pressed"]
 [connection signal="save_pressed" from="HUD/Menu" to="." method="_on_menu_save_pressed"]
-[connection signal="pressed" from="HUD/Menu/HBoxContainer/Save" to="HUD/Menu" method="_on_save_pressed"]
-[connection signal="pressed" from="HUD/Menu/HBoxContainer/Load" to="HUD/Menu" method="_on_load_pressed"]
-[connection signal="pressed" from="HUD/Menu/HBoxContainer/AddClass" to="HUD/Menu" method="_on_add_class_pressed"]
-[connection signal="pressed" from="HUD/Menu/HBoxContainer/Add" to="HUD/Menu" method="_on_add_pressed"]
-[connection signal="pressed" from="HUD/Menu/HBoxContainer/EditSavePath" to="HUD/Menu" method="_on_edit_save_path_pressed"]
+[connection signal="index_pressed" from="HUD/Menu/Save Operation" to="HUD/Menu" method="_on_save_operation_index_pressed"]
+[connection signal="index_pressed" from="HUD/Menu/Item Operation" to="HUD/Menu" method="_on_item_operation_index_pressed"]
+[connection signal="index_pressed" from="HUD/Menu/Class Operation" to="HUD/Menu" method="_on_class_operation_index_pressed"]

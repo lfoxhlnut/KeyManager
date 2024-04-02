@@ -3,7 +3,6 @@ extends Node
 @onready var menu: Menu = $HUD/Menu
 
 # TODO: del class
-# item class 的 min size
 # 添加注释, 或者两者一起(可能比较
 # auto save
 # 属性: 不显示
@@ -25,12 +24,12 @@ func _on_menu_save_pressed(save_key: String = await menu.get_save_key()) -> void
 	Global.save_data(content.data_dict, save_key, menu.save_path)
 
 
-func _on_menu_add_pressed(data: Data) -> void:
+func _on_menu_item_add_pressed(data: Data) -> void:
 	if not data.is_empty():
 		content.add_item(data)
 
 
-func _on_menu_add_class_pressed(data: Data) -> void:
+func _on_menu_class_add_pressed(data: Data) -> void:
 	if not data.is_empty():
 		content.add_class(data)
 
