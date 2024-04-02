@@ -4,6 +4,7 @@ extends Control
 const ItemTscn := preload("res://ui/item.tscn")
 const EditWindowTscn = preload("res://ui/edit_window.tscn")
 const InfoInputTscn = preload("res://ui/info_input.tscn")
+@export var min_title_text_size: int = 12	# 官方没有提供 tab min width 这样的功能, 出此下策
 
 var data_dict: Dictionary = {}:
 	set(v):
@@ -30,7 +31,6 @@ func _ready() -> void:
 	}
 	v_box.position.x = 0.5 * size.x
 	scroll_container.size.y = 0.6 * size.y
-	pass
 
 
 func _exit_tree() -> void:
@@ -40,9 +40,23 @@ func _exit_tree() -> void:
 func initialize() -> void:
 	title.clear_tabs()
 	for key: String in data_dict:
-		title.add_tab(key)
+		add_title_tab_text(key)
+	
 	_on_title_tab_changed(title.current_tab)
 
+
+
+func add_title_tab_text(s: String) -> void:
+	"""优先使用此函数替代 title.add_tab()"""
+	if s.length() >= min_title_text_size:
+		title.add_tab(s)
+		return
+	@warning_ignore("integer_division")
+	var left := (min_title_text_size - s.length()) / 2
+	var right := min_title_text_size - left - s.length()
+	var res := " ".repeat(left) + s + " ".repeat(right)
+	title.add_tab(res)
+	
 
 func _on_title_resized() -> void:
 	if not is_node_ready():
@@ -50,9 +64,9 @@ func _on_title_resized() -> void:
 	scroll_container.position.y = title.size.y + 64 + 32
 
 
-func _on_title_tab_changed(_tab: int) -> void:
+func _on_title_tab_changed(tab: int = title.current_tab) -> void:
 	free_vbox_children()
-	var key: String = title.get_tab_title(title.current_tab)
+	var key: String = get_title_tab_text(tab)
 	for id: int in data_dict[key].size():
 		var item: Item = ItemTscn.instantiate()
 		v_box.add_child(item)
@@ -77,6 +91,12 @@ func _on_title_tab_changed(_tab: int) -> void:
 		# print 打印出来的数据不一样, 必须手动点击一下展开, vbox 的位置才是正确的
 		item._on_unfold_toggled(true)
 		item._on_unfold_toggled(false)
+
+
+func get_title_tab_text(tab: int) -> String:
+	"""优先使用此函数替代 title.get_tab_title()"""
+	var res := title.get_tab_title(tab).strip_edges()
+	return res
 
 
 func free_vbox_children() -> void:
