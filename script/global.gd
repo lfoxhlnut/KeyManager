@@ -70,7 +70,6 @@ func save_config(path: String = _config_path) -> void:
 
 
 func load_save(passwd: String, save_path: String) -> Dictionary:
-	print_debug("load pswd:", passwd)
 	var res := {}
 	var save_file := FileAccess.open_encrypted_with_pass(save_path.path_join(DEFAULT_SAVE_FILENAME), FileAccess.READ, passwd)
 	if save_file == null:

@@ -74,7 +74,7 @@ func _on_edit_pressed() -> void:
 	)
 	
 	ew.confirmed.connect(func(_data: Data):
-		data = _data
+		data = _data	# 即使 _data 是空的, 也想不出阻止用户这样做的理由
 		ew.queue_free()
 		Global.get_hud().exclusive_mouse = false
 		data_modified.emit()

@@ -16,6 +16,10 @@ func _init(_title: String = "", _info: Array[String] = []) -> void:
 	info = _info
 
 
+func is_empty() -> bool:
+	return title.is_empty() and info.is_empty()
+
+
 func _to_string() -> String:
 	var info_str := ""
 	if info.size() > 0:

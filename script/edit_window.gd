@@ -125,8 +125,8 @@ func _on_confirm_pressed() -> void:
 		if i.text != "":
 			data.info.append(i.text)
 	
-	if Global.DEBUG:
-		print("confirmed data:\n\ttitle: [%s]\n\tcontent: [%s]" % [data.title, data.info])
+	#if Global.DEBUG:
+		#print("confirmed data:\n\ttitle: [%s]\n\tcontent: [%s]" % [data.title, data.info])
 	confirmed.emit(data)
 
 

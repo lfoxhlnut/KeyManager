@@ -5,7 +5,6 @@ extends Node
 # TODO: del class
 # item class 的 min size
 # 添加注释, 或者两者一起(可能比较
-# 如果是空的话就不添加新项目
 # auto save
 # 属性: 不显示
 
@@ -27,9 +26,11 @@ func _on_menu_save_pressed(save_key: String = await menu.get_save_key()) -> void
 
 
 func _on_menu_add_pressed(data: Data) -> void:
-	content.add_item(data)
+	if not data.is_empty():
+		content.add_item(data)
 
 
 func _on_menu_add_class_pressed(data: Data) -> void:
-	content.add_class(data)
+	if not data.is_empty():
+		content.add_class(data)
 
