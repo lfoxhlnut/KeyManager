@@ -10,8 +10,8 @@ var data_dict: Dictionary = {}:
 		data_dict = v.duplicate()
 		initialize()
 @onready var title: TabBar = $Title
-# TODO: 添加滚动条 # 似乎官方组件有考虑到这一点
-@onready var v_box: VBoxContainer = $VBoxContainer
+@onready var v_box: VBoxContainer = $ScrollContainer/VBoxContainer
+@onready var scroll_container: ScrollContainer = $ScrollContainer
 
 
 func _ready() -> void:
@@ -29,7 +29,7 @@ func _ready() -> void:
 		],
 	}
 	v_box.position.x = 0.5 * size.x
-	
+	scroll_container.size.y = 0.6 * size.y
 	pass
 
 
@@ -47,7 +47,7 @@ func initialize() -> void:
 func _on_title_resized() -> void:
 	if not is_node_ready():
 		await ready
-	v_box.position.y = title.size.y + 64
+	scroll_container.position.y = title.size.y + 64 + 32
 
 
 func _on_title_tab_changed(_tab: int) -> void:
@@ -57,7 +57,13 @@ func _on_title_tab_changed(_tab: int) -> void:
 		var item: Item = ItemTscn.instantiate()
 		v_box.add_child(item)
 		item.resized.connect(func():
-			v_box.position.x = 0.5 * size.x - 0.5 * item.size.x
+			# 我也不记得这里为什么要这样写了,
+			# 只知道删掉这句话或者删掉 0.5*size.x 显示就有问题
+			# 虽然我已经设置 scroll container 锚点什么的居中了
+			scroll_container.position.x = 0.5 * size.x - 0.5 * item.size.x
+		)
+		item.minimum_size_changed.connect(func():
+			scroll_container.size.x = item.custom_minimum_size.x
 		)
 		# NOTE: gdscript 里没有函数闭包, 不能访问函数的局部变量
 		# 但是 局部节点变量的 queue_free() 是有用的, 全局变量或说类的成员也是可以访问的
@@ -65,6 +71,8 @@ func _on_title_tab_changed(_tab: int) -> void:
 			data_dict[key][id] = item.data
 		)
 		item.data = data_dict[key][id]
+		
+		# ↓ 这两句注释的背景是, vbox 的父节点直接是 content 而非 scroll 容器, 不过现在问题仍然存在
 		# 真奇怪, 无论怎么设置 vbox 的 pos 都没用, remote 检查器里的数据和
 		# print 打印出来的数据不一样, 必须手动点击一下展开, vbox 的位置才是正确的
 		item._on_unfold_toggled(true)

@@ -1,3 +1,5 @@
 # Godot 4+ specific ignores
 .godot/
 tmp_save.txt
+ui/test.tscn
+script/test.gd

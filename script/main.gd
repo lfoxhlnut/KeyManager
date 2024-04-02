@@ -10,10 +10,12 @@ extends Node
 # item list 滚动条支持
 # 属性: 不显示
 
+func _ready() -> void:
+	_on_menu_load_pressed("111")	# 会覆盖掉 content.gd 里的测试数据
 
 
-func _on_menu_load_pressed() -> void:
-	var res := Global.load_save(await menu.get_save_key(), menu.save_path)
+func _on_menu_load_pressed(save_key := await menu.get_save_key()) -> void:
+	var res := Global.load_save(save_key, menu.save_path)
 	if res == {}:
 		# TODO: 添加提示等
 		print_debug("no save or password err")
