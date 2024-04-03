@@ -88,9 +88,7 @@ func _on_edit_save_path_pressed() -> void:
 func get_data_from_ew(default: Data = Data.new()) -> Data:
 	var ew: EditWindow = EditWindowTscn.instantiate()
 	ew.data = default
-	ew.resized.connect(func():
-		ew.global_position = 0.5 * Global.WIN_SIZE - 0.5 * ew.size
-	)
+	ew.global_position = 0.5 * Global.WIN_SIZE - 0.5 * ew.size	# 这句话产生正确效果是因为 ew 的锚点在左上角
 	
 	hud.add_child(ew)
 	hud.exclusive_mouse = true

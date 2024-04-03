@@ -16,7 +16,8 @@ var data := Data.new():
 
 @onready var head: LineEdit = $Head
 @onready var body: Control = $Body
-@onready var vbox: VBoxContainer = $Body/VBoxContainer
+@onready var vbox: VBoxContainer = $Body/ScrollContainer/VBoxContainer
+@onready var scroll_container: ScrollContainer = $Body/ScrollContainer
 @onready var add: Button = $Body/Add
 
 var info_num: int:
@@ -29,16 +30,12 @@ var info_id: int
 
 func _ready() -> void:
 	head.size.x = size.x
-	head.size.y = 64
-	vbox.custom_minimum_size.x = size.x
-	body.position.y = 64 + 16
+	head.size.y = 48
+	vbox.custom_minimum_size.x = scroll_container.size.x
 	#data = Data.new("title ff", ["info1", "info3", "fffff中文ffffff"])
 
 
 func initialize() -> void:
-	# TODO: 常量 64 写为 const
-	vbox.custom_minimum_size.y = 64 * data.info.size()
-	
 	head.text = data.title
 	info_num = 0
 	info_id = 0
@@ -60,20 +57,16 @@ func create_hbox(content: String = "") -> HBoxContainer:
 	line_edit.text = content
 	line_edit.id = info_id
 	info_id += 1
-	line_edit.custom_minimum_size.x = vbox.custom_minimum_size.x * 0.5
-	line_edit.size.y = 48
+	line_edit.custom_minimum_size.x = hbox.custom_minimum_size.x * 0.6
 	
 	var del := Button.new()
 	del.text = "delete"
-	del.size.x = vbox.size.x * 0.2
 	del.pressed.connect(func():
-		# BUG: 这样写比较省事, 但是如果用户一直删删加加, info_num 会爆
+		# BUG: 这样写比较省事, 但是如果用户一直删删加加, info_id 会爆
 		for k: Node in hbox.get_children():
 			k.queue_free()
 		hbox.queue_free()
-		vbox.custom_minimum_size.y -= 64
-		#print_debug("hbox freed")
-		)
+	)
 	
 	var swap := func(a: MyLineEdit, b: MyLineEdit):
 		var s: String = a.text
@@ -122,11 +115,9 @@ func _on_confirm_pressed() -> void:
 	data.title = head.text
 	data.info = []
 	for i: MyLineEdit in get_lines():
-		if i.text != "":
+		if i.text != "":	# 忽略无效项
 			data.info.append(i.text)
 	
-	#if Global.DEBUG:
-		#print("confirmed data:\n\ttitle: [%s]\n\tcontent: [%s]" % [data.title, data.info])
 	confirmed.emit(data)
 
 
@@ -144,13 +135,7 @@ func get_lines(reverse: bool = false) -> Array[MyLineEdit]:
 	)
 	return with_type
 
+
 func _on_add_pressed() -> void:
 	vbox.add_child(create_hbox())
-	vbox.custom_minimum_size.y += 64
 
-
-func _on_v_box_container_minimum_size_changed() -> void:
-	body.size.x = vbox.custom_minimum_size.x
-	body.size.y = vbox.custom_minimum_size.y + 128
-	@warning_ignore("narrowing_conversion")
-	size.y = body.size.y + 128
