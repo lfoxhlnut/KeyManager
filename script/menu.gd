@@ -85,9 +85,9 @@ func _on_edit_save_path_pressed() -> void:
 	file_dialog.hide()
 
 
-func get_data_from_ew() -> Data:
+func get_data_from_ew(default: Data = Data.new()) -> Data:
 	var ew: EditWindow = EditWindowTscn.instantiate()
-	
+	ew.data = default
 	ew.resized.connect(func():
 		ew.global_position = 0.5 * Global.WIN_SIZE - 0.5 * ew.size
 	)

@@ -118,3 +118,56 @@ func add_class(data: Data) -> void:
 		(data_dict[data.title] as Array).append(Data.new(i))
 	
 	initialize()	# 只设置 data_dict 的一个键, 会触发 setter 吗
+
+
+func modify_current_class(modified: Data) -> void:
+	var key := get_title_tab_text(title.current_tab)
+	var items: Array[Data] = []
+	
+	if modified.title != key and data_dict.has(modified.title):
+		# 当前 class 新的名字与原有的重复
+		# TODO: 警告用户
+		items = data_dict[modified.title]	# 无需深复制
+	
+	# 筛选出保留下的那些 item
+	for i: String in modified.info:
+		for k: Data in data_dict[key]:
+			if k.title == i:
+				items.append(k)
+				break
+	
+	data_dict.erase(key)
+	data_dict[modified.title] = items
+	initialize()
+	
+	# 切换 tab 到刚刚修改过的 class
+	var tab_id := get_tab_id_by_text(modified.title)
+	assert(tab_id != -1)
+	title.current_tab = tab_id	# 会触发_on_title_tab_changed
+
+
+func get_current_class_info() -> Data:
+	var key := get_title_tab_text(title.current_tab)
+	var info: Array[String] = []
+	for i: Data in data_dict[key]:
+		info.append(i.title)
+	return Data.new(key, info)
+
+
+func get_tab_id_by_text(s: String) -> int:
+	for i: int in title.tab_count:
+		if get_title_tab_text(i) == s:
+			return i
+	return -1
+
+
+
+
+
+
+
+
+
+
+
+
