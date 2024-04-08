@@ -73,14 +73,17 @@ func _on_edit_pressed() -> void:
 		ew.global_position = 0.5 * Global.WIN_SIZE - 0.5 * ew.size
 	)
 	
+	# 现在这样写也行, 也可考虑用 menu(或者将来可能是 hud)的方法 get data from ew
 	ew.confirmed.connect(func(_data: Data):
-		data = _data	# 即使 _data 是空的, 也想不出阻止用户这样做的理由
-		ew.queue_free()
-		Global.get_hud().exclusive_mouse = false
+		data = _data
 		data_modified.emit()
 	)
 	Global.get_hud().add_child(ew)
 	Global.get_hud().exclusive_mouse = true
+	
+	await ew.canceled
+	ew.queue_free()
+	Global.get_hud().exclusive_mouse = false
 
 
 func _on_head_or_body_resized() -> void:

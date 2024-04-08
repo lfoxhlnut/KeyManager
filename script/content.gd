@@ -2,8 +2,6 @@ class_name Content
 extends Control
 
 const ItemTscn := preload("res://ui/item.tscn")
-const EditWindowTscn = preload("res://ui/edit_window.tscn")
-const InfoInputTscn = preload("res://ui/info_input.tscn")
 @export var min_title_text_size: int = 12	# 官方没有提供 tab min width 这样的功能, 出此下策
 
 var data_dict: Dictionary = {}:

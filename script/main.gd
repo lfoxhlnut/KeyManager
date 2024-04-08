@@ -26,6 +26,7 @@ func _on_menu_save_pressed(save_key: String) -> void:
 
 
 func _on_menu_item_add_pressed(data: Data) -> void:
+	# 空的数据不被承认
 	if not data.is_empty():
 		content.add_item(data)
 
@@ -38,4 +39,7 @@ func _on_menu_class_add_pressed(data: Data) -> void:
 func _on_menu_item_manage_pressed() -> void:
 	var old_data := content.get_current_class_info()
 	var modified := await menu.get_data_from_ew(old_data)
-	content.modify_current_class(modified)
+	
+	# 用户按的不是 Cancel 才承认这次操作. 也可考虑把获取 modified 的工作放给 item_manage 这个信号, 就像 save, load 一样
+	if modified.valid:
+		content.modify_current_class(modified)

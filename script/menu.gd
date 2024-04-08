@@ -89,6 +89,10 @@ func _on_edit_save_path_pressed() -> void:
 	file_dialog.hide()
 
 
+# 不要主动使用这个变量
+var _res: Data = Data.new()
+# 可以考虑做成 HUD 的方法
+## 如果返回的 Data 的 valid 是无效的, 那么不保证 Data 的其他信息是有用的(也不保证是空的)
 func get_data_from_ew(default: Data = Data.new()) -> Data:
 	var ew: EditWindow = EditWindowTscn.instantiate()
 	ew.data = default
@@ -97,10 +101,14 @@ func get_data_from_ew(default: Data = Data.new()) -> Data:
 	hud.add_child(ew)
 	hud.exclusive_mouse = true
 	
-	var res: Data = await ew.confirmed
+	_res.valid = false
+	ew.confirmed.connect(func(d: Data):
+		_res = d
+	)
+	await ew.canceled
 	ew.queue_free()
 	hud.exclusive_mouse = false
-	return res
+	return _res
 
 
 # 可以考虑做成 HUD 的方法
@@ -142,7 +150,9 @@ func _on_save_operation_index_pressed(index: int) -> void:
 func _on_item_operation_index_pressed(index: int) -> void:
 	match index:
 		ItemOp.ADD:
-			item_add_pressed.emit(await get_data_from_ew())
+			var d := await get_data_from_ew()
+			if d.valid:
+				item_add_pressed.emit(d)
 		ItemOp.MANAGE:
 			item_manage_pressed.emit()
 		_:

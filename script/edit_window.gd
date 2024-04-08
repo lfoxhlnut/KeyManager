@@ -2,6 +2,8 @@ class_name EditWindow
 extends Panel
 
 signal confirmed(_data: Data)
+## canceled will emit automatically after confirmed emit
+signal canceled
 
 
 const GROUP_NAME := "ew_body_le"
@@ -117,8 +119,8 @@ func _on_confirm_pressed() -> void:
 	for i: MyLineEdit in get_lines():
 		if i.text != "":	# 忽略无效项
 			data.info.append(i.text)
-	
 	confirmed.emit(data)
+	canceled.emit()
 
 
 func get_lines(reverse: bool = false) -> Array[MyLineEdit]:
@@ -139,3 +141,6 @@ func get_lines(reverse: bool = false) -> Array[MyLineEdit]:
 func _on_add_pressed() -> void:
 	vbox.add_child(create_hbox())
 
+
+func _on_cancel_pressed() -> void:
+	canceled.emit()
