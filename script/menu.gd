@@ -1,8 +1,8 @@
 class_name Menu
 extends Control
 
-signal save_pressed
-signal load_pressed
+signal save_pressed(save_key: String)
+signal load_pressed(save_key: String)
 signal item_add_pressed(data: Data)
 signal item_manage_pressed
 signal class_add_pressed(data: Data)
@@ -103,25 +103,33 @@ func get_data_from_ew(default: Data = Data.new()) -> Data:
 	return res
 
 
-func get_save_key() -> String:
+# 可以考虑做成 HUD 的方法
+func get_input(placeholder: String = "") -> Array:
 	info_input.text = ""
-	info_input.placeholder_text = "Input secret key here"
+	info_input.placeholder_text = placeholder
 	center_container.show()
 	hud.exclusive_mouse = true
 	
-	var save_key: String = await info_input.confirmed
+	# 此处写法过于丑陋, 原因在于下面的把 infoinput.txt 设置成空, 还不想设置全局变量 save_key
+	# 可考虑: 发送 confirm 的时候发送 cancel, 给 confirm 绑定回调方法, await cancel
+	# 现在能跑就不再改了
+	var res: Array = await info_input.closed
 	center_container.hide()
 	hud.exclusive_mouse = false
 	info_input.text = ""
-	return save_key
+	return res
 
 
 func _on_save_operation_index_pressed(index: int) -> void:
 	match index:
-		SaveOp.SAVE:
-			save_pressed.emit()
-		SaveOp.LOAD:
-			load_pressed.emit()
+		SaveOp.SAVE, SaveOp.LOAD:
+			var res := await get_input("Input secret key here")
+			if not res[0] == info_input.canceled:
+				var save_key: String = res[1]["text"]
+				if index == SaveOp.SAVE:
+					save_pressed.emit(save_key)
+				else:
+					load_pressed.emit(save_key)
 		SaveOp.EDIT_PATH:
 			_on_edit_save_path_pressed()
 		SaveOp.OPEN_PATH:

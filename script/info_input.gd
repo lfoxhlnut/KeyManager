@@ -2,6 +2,8 @@ class_name InfoInput
 extends PanelContainer
 
 signal confirmed(text: String)
+signal canceled
+signal closed(_signal: Signal, param: Dictionary)
 
 @export var placeholder_text := "input info here":
 	set(v):
@@ -46,9 +48,15 @@ func _ready() -> void:
 
 func _on_confirm_pressed() -> void:
 	confirmed.emit(line_edit.text)
+	closed.emit(confirmed, {text=line_edit.text})
 
 
 func _on_resized() -> void:
 	if not is_node_ready():
 		await ready
 	center_container.size = size
+
+
+func _on_cancel_pressed() -> void:
+	canceled.emit()
+	closed.emit(canceled, {})

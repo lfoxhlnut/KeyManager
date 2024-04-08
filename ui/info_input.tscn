@@ -28,5 +28,10 @@ layout_mode = 2
 layout_mode = 2
 text = "Confirm"
 
+[node name="Cancel" type="Button" parent="CenterContainer/HBoxContainer"]
+layout_mode = 2
+text = "Cancel"
+
 [connection signal="resized" from="." to="." method="_on_resized"]
 [connection signal="pressed" from="CenterContainer/HBoxContainer/Confirm" to="." method="_on_confirm_pressed"]
+[connection signal="pressed" from="CenterContainer/HBoxContainer/Cancel" to="." method="_on_cancel_pressed"]

@@ -12,7 +12,7 @@ func _ready() -> void:
 	_on_menu_load_pressed("111")	# 会覆盖掉 content.gd 里的测试数据
 
 
-func _on_menu_load_pressed(save_key: String = await menu.get_save_key()) -> void:
+func _on_menu_load_pressed(save_key: String) -> void:
 	var res := Global.load_save(save_key, menu.save_path)
 	if res == {}:
 		# TODO: 添加提示等
@@ -21,7 +21,7 @@ func _on_menu_load_pressed(save_key: String = await menu.get_save_key()) -> void
 		content.data_dict = res
 
 
-func _on_menu_save_pressed(save_key: String = await menu.get_save_key()) -> void:
+func _on_menu_save_pressed(save_key: String) -> void:
 	Global.save_data(content.data_dict, save_key, menu.save_path)
 
 
