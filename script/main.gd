@@ -2,13 +2,11 @@ extends Node
 @onready var content: Content = $Content
 @onready var menu: Menu = $HUD/Menu
 
-# TODO: del class
+# TODO:
 # 添加注释, 或者两者一起(可能比较
 # auto save
 # 属性: 不显示
 # save structure
-# edit window 也需要滚动条
-# menu.infoinput 位置有问题, 当内容特别多的时候, 此时删东西也有问题
 
 func _ready() -> void:
 	_on_menu_load_pressed("111")	# 会覆盖掉 content.gd 里的测试数据
@@ -35,7 +33,6 @@ func _on_menu_item_add_pressed(data: Data) -> void:
 func _on_menu_class_add_pressed(data: Data) -> void:
 	if not data.is_empty():
 		content.add_class(data)
-
 
 
 func _on_menu_item_manage_pressed() -> void:

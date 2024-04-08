@@ -11,15 +11,16 @@ var data_dict: Dictionary = {}:
 		data_dict = v.duplicate()
 		initialize()
 @onready var title: TabBar = $Title
-@onready var v_box: VBoxContainer = $ScrollContainer/VBoxContainer
-@onready var scroll_container: ScrollContainer = $ScrollContainer
+@onready var center_container: CenterContainer = $CenterContainer
+@onready var scroll_container: ScrollContainer = $CenterContainer/ScrollContainer
+@onready var v_box: VBoxContainer = $CenterContainer/ScrollContainer/VBoxContainer
+
 
 
 func _ready() -> void:
 	data_dict = {
 		"class1": [
 			Data.new("title1", ["fff", "11中文"]),
-			#Data.new("222", ["password", "11中文"]),
 			Data.new("222", []),
 			Data.new("3", ["password", "11中文"]),
 		],
@@ -29,8 +30,7 @@ func _ready() -> void:
 			Data.new("3", ["password", "11中文"]),
 		],
 	}
-	v_box.position.x = 0.5 * size.x
-	scroll_container.size.y = 0.6 * size.y
+	_on_title_resized()
 
 
 func _exit_tree() -> void:
@@ -40,14 +40,13 @@ func _exit_tree() -> void:
 func initialize() -> void:
 	title.clear_tabs()
 	for key: String in data_dict:
-		add_title_tab_text(key)
+		add_title_tab(key)
 	
 	_on_title_tab_changed(title.current_tab)
 
 
-
-func add_title_tab_text(s: String) -> void:
-	"""优先使用此函数替代 title.add_tab()"""
+func add_title_tab(s: String) -> void:
+	## 优先使用此函数替代 title.add_tab()
 	if s.length() >= min_title_text_size:
 		title.add_tab(s)
 		return
@@ -61,7 +60,10 @@ func add_title_tab_text(s: String) -> void:
 func _on_title_resized() -> void:
 	if not is_node_ready():
 		await ready
-	scroll_container.position.y = title.size.y + 64 + 32
+	center_container.position.y = title.position.y + title.size.y + 16
+	center_container.size.x = size.x
+	center_container.size.y = size.y - center_container.position.y
+	scroll_container.custom_minimum_size.y = center_container.size.y * 0.9
 
 
 func _on_title_tab_changed(tab: int = title.current_tab) -> void:
@@ -69,32 +71,22 @@ func _on_title_tab_changed(tab: int = title.current_tab) -> void:
 	var key: String = get_title_tab_text(tab)
 	for id: int in data_dict[key].size():
 		var item: Item = ItemTscn.instantiate()
-		v_box.add_child(item)
-		item.resized.connect(func():
-			# 我也不记得这里为什么要这样写了,
-			# 只知道删掉这句话或者删掉 0.5*size.x 显示就有问题
-			# 虽然我已经设置 scroll container 锚点什么的居中了
-			scroll_container.position.x = 0.5 * size.x - 0.5 * item.size.x
-		)
-		item.minimum_size_changed.connect(func():
-			scroll_container.size.x = item.custom_minimum_size.x
-		)
 		# NOTE: gdscript 里没有函数闭包, 不能访问函数的局部变量
 		# 但是 局部节点变量的 queue_free() 是有用的, 全局变量或说类的成员也是可以访问的
 		item.data_modified.connect(func():
 			data_dict[key][id] = item.data
 		)
 		item.data = data_dict[key][id]
+		v_box.add_child(item)
 		
-		# ↓ 这两句注释的背景是, vbox 的父节点直接是 content 而非 scroll 容器, 不过现在问题仍然存在
-		# 真奇怪, 无论怎么设置 vbox 的 pos 都没用, remote 检查器里的数据和
-		# print 打印出来的数据不一样, 必须手动点击一下展开, vbox 的位置才是正确的
+		# NOTE: 必须主动展开一次, item 的 size, min_size 才是正确的
 		item._on_unfold_toggled(true)
 		item._on_unfold_toggled(false)
+		scroll_container.custom_minimum_size.x = item.custom_minimum_size.x
 
 
 func get_title_tab_text(tab: int) -> String:
-	"""优先使用此函数替代 title.get_tab_title()"""
+	## 优先使用此函数替代 title.get_tab_title()
 	var res := title.get_tab_title(tab).strip_edges()
 	return res
 
@@ -159,15 +151,4 @@ func get_tab_id_by_text(s: String) -> int:
 		if get_title_tab_text(i) == s:
 			return i
 	return -1
-
-
-
-
-
-
-
-
-
-
-
 

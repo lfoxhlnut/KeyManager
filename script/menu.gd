@@ -1,5 +1,5 @@
 class_name Menu
-extends MenuBar
+extends Control
 
 signal save_pressed
 signal load_pressed
@@ -29,23 +29,27 @@ const ClassOpText = [
 	"Add class",
 	"Manage classes"
 ]
-@onready var save_operation: PopupMenu = $"Save Operation"
-@onready var item_operation: PopupMenu = $"Item Operation"
-@onready var class_operation: PopupMenu = $"Class Operation"
-
-@onready var info_input: InfoInput = $InfoInput
+@onready var save_operation: PopupMenu = $"MenuBar/Save Operation"
+@onready var item_operation: PopupMenu = $"MenuBar/Item Operation"
+@onready var class_operation: PopupMenu = $"MenuBar/Class Operation"
+@onready var info_input: InfoInput = $CenterContainer/InfoInput
 @onready var file_dialog: FileDialog = $FileDialog
 @onready var hud: HUD = $".."
+@onready var center_container: CenterContainer = $CenterContainer
 
 var save_path: String = Global.DEFAULT_SAVE_PATH
 
 
 func _ready() -> void:
+	center_container.size = Global.WIN_SIZE
+	info_input.custom_minimum_size = Global.WIN_SIZE * 0.6
+	info_input.input_size = Vector2(size.x * 0.4, size.x * 0.1)
 	@warning_ignore("narrowing_conversion")
 	file_dialog.size.x = 0.75 * size.x
 	@warning_ignore("narrowing_conversion")
 	file_dialog.size.y = 0.4 * size.x	# 这里用的是 size.x, 只能保证 menu 的宽度和屏幕一样
 	file_dialog.position = 0.5 * (Global.WIN_SIZE - (file_dialog.size as Vector2))	# 居中
+
 	
 	set_popup_menu_item_text()
 	load_config()
@@ -100,15 +104,15 @@ func get_data_from_ew(default: Data = Data.new()) -> Data:
 
 
 func get_save_key() -> String:
-	# TODO: hud 遮罩不能设为无色透明, 不然 info input 太不明显
+	info_input.text = ""
 	info_input.placeholder_text = "Input secret key here"
-	info_input.show()
+	center_container.show()
 	hud.exclusive_mouse = true
 	
 	var save_key: String = await info_input.confirmed
-	info_input.hide()
-	# TODO: 重置 info input 的输入信息
+	center_container.hide()
 	hud.exclusive_mouse = false
+	info_input.text = ""
 	return save_key
 
 
@@ -121,7 +125,8 @@ func _on_save_operation_index_pressed(index: int) -> void:
 		SaveOp.EDIT_PATH:
 			_on_edit_save_path_pressed()
 		SaveOp.OPEN_PATH:
-			print_debug("OPEN_PATH")
+			# NOTE: ↓ 未在 android 上实现, 不行就试试 shell_open()
+			OS.shell_show_in_file_manager(ProjectSettings.globalize_path(save_path), true)
 		_:
 			print_debug("unexpected index: ", index)
 
