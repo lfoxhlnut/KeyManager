@@ -2,4 +2,6 @@
 .godot/
 tmp_save.txt
 ui/test.tscn
+ui/test_input.tscn
 script/test.gd
+script/test_input.gd

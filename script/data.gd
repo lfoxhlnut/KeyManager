@@ -34,3 +34,19 @@ static func from_string(s: String) -> Data:
 	for i: int in range(1, pieces.size()):
 		_info.append(pieces[i])
 	return Data.new(_title, _info)
+
+
+func to_dict() -> Dictionary:
+	return {
+		title=title,
+		info=info,
+	}
+
+
+static func from_dict(d: Dictionary) -> Data:
+	var res := Data.new()
+	res.title = d["title"]
+	var type_id: int = typeof(d["info"])
+	assert(type_id == TYPE_PACKED_STRING_ARRAY)
+	res.info = d["info"]
+	return res

@@ -14,7 +14,7 @@ const EditWindowTscn := preload("res://ui/edit_window.tscn")
 
 var data := Data.new():
 	set(v):
-		# NOTE:直接写 data = v 不会触发 setter
+		# NOTE:直接写 data = v 不会触发 Data.title 和 Data.info 的 setter
 		data.title = v.title
 		data.info = v.info
 		initialize()

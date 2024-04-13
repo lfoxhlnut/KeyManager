@@ -38,6 +38,7 @@ const ClassOpText = [
 @onready var center_container: CenterContainer = $CenterContainer
 
 var save_path: String = Global.DEFAULT_SAVE_PATH
+var save_ver := ""
 
 
 func _ready() -> void:
@@ -65,10 +66,13 @@ func set_popup_menu_item_text() -> void:
 
 
 func load_config() -> void:
-	if not Global.config.has_section(CONFIG_SECTION_NAME):
+	var config := Global.config
+	if not config.has_section(CONFIG_SECTION_NAME):
 		return
 	
-	save_path = Global.config.get_value(CONFIG_SECTION_NAME, "save_path", Global.DEFAULT_SAVE_PATH)
+	# 有默认值的话不需要判定键值是否存在
+	save_path = config.get_value(CONFIG_SECTION_NAME, "save_path", Global.DEFAULT_SAVE_PATH)
+	save_ver = config.get_value(CONFIG_SECTION_NAME, "save_ver", "0.0")
 
 
 func _exit_tree() -> void:
@@ -77,6 +81,7 @@ func _exit_tree() -> void:
 
 func save_config() -> void:
 	Global.config.set_value(CONFIG_SECTION_NAME, "save_path", save_path)
+	Global.config.set_value(CONFIG_SECTION_NAME, "save_ver", save_ver)
 
 
 func _on_edit_save_path_pressed() -> void:

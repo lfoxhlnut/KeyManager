@@ -22,11 +22,7 @@ var data := Data.new():
 @onready var scroll_container: ScrollContainer = $Body/ScrollContainer
 @onready var add: Button = $Body/Add
 
-var info_num: int:
-	get:
-		if not is_node_ready():
-			await ready
-		return vbox.get_child_count()
+
 var info_id: int
 
 
@@ -39,7 +35,6 @@ func _ready() -> void:
 
 func initialize() -> void:
 	head.text = data.title
-	info_num = 0
 	info_id = 0
 	free_vbox()
 	

@@ -6,7 +6,8 @@ extends Node
 # 添加注释, 或者两者一起(可能比较
 # auto save
 # 属性: 不显示
-# save structure
+# class 重新排序
+# item 文本过长如何处理
 
 func _ready() -> void:
 	_on_menu_load_pressed("111")	# 会覆盖掉 content.gd 里的测试数据
@@ -17,12 +18,25 @@ func _on_menu_load_pressed(save_key: String) -> void:
 	if res == {}:
 		# TODO: 添加提示等
 		print_debug("no save or password err")
-	else:
-		content.data_dict = res
+		return
+	
+	match menu.save_ver:
+		"0.0":
+			content.set_save_data(res, menu.save_ver)
+		"1.0":
+			content.set_save_data(res["content"], menu.save_ver)
 
 
 func _on_menu_save_pressed(save_key: String) -> void:
-	Global.save_data(content.data_dict, save_key, menu.save_path)
+	menu.save_ver = "1.0"
+	Global.save_data(get_save_dict(), save_key, menu.save_path)
+
+
+func get_save_dict() -> Dictionary:
+	var save_dict := {
+		content=content.get_save_data(),
+	}
+	return save_dict
 
 
 func _on_menu_item_add_pressed(data: Data) -> void:
