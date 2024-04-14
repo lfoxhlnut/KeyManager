@@ -6,8 +6,8 @@ extends Node
 # 添加注释, 或者两者一起(可能比较
 # auto save
 # 属性: 不显示
-# class 重新排序
 # item 文本过长如何处理
+# ew 换序的时候保持视觉正确的控件焦点
 
 func _ready() -> void:
 	_on_menu_load_pressed("111")	# for test
@@ -57,3 +57,23 @@ func _on_menu_item_manage_pressed() -> void:
 	# 用户按的不是 Cancel 才承认这次操作. 也可考虑把获取 modified 的工作放给 item_manage 这个信号, 就像 save, load 一样
 	if modified.valid:
 		content.modify_current_class(modified)
+
+
+func _on_menu_class_manage_pressed() -> void:
+	var original := Data.new("", content.tab_title)
+	
+	var modified := await menu.get_data_from_ew(original, EwSubInfo.TYPE.label)
+	if not modified.valid:
+		return
+	
+	var res := modified.info
+	var sequence: Array[int] = []
+	for i: String in res:
+		for id: int in content.tab_title.size():
+			if i == content.tab_title[id]:
+				sequence.append(id)
+				break
+	
+	content.rearrange_classes_sequence(sequence)
+	
+		

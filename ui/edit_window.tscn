@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://o8uxe5sehgvf"]
+[gd_scene load_steps=5 format=3 uid="uid://o8uxe5sehgvf"]
 
 [ext_resource type="Script" path="res://script/edit_window.gd" id="1_2tqmw"]
 [ext_resource type="Texture2D" uid="uid://30d6k5h814jr" path="res://asset/item/panel.png" id="1_o0tyx"]
+[ext_resource type="PackedScene" uid="uid://c327jtwcs74i0" path="res://ui/ew_sub_info.tscn" id="3_bqxl5"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_b5y6q"]
 texture = ExtResource("1_o0tyx")
@@ -12,10 +13,7 @@ offset_bottom = 373.0
 theme_override_styles/panel = SubResource("StyleBoxTexture_b5y6q")
 script = ExtResource("1_2tqmw")
 
-[node name="Head" type="LineEdit" parent="."]
-layout_mode = 1
-offset_right = 67.063
-offset_bottom = 48.0
+[node name="Head" parent="." instance=ExtResource("3_bqxl5")]
 
 [node name="Body" type="Control" parent="."]
 layout_mode = 1

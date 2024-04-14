@@ -82,6 +82,7 @@ bg_color = Color(0.129412, 0.14902, 0.180392, 1)
 [connection signal="resized" from="Content/Title" to="Content" method="_on_title_resized"]
 [connection signal="tab_changed" from="Content/Title" to="Content" method="_on_title_tab_changed"]
 [connection signal="class_add_pressed" from="HUD/Menu" to="." method="_on_menu_class_add_pressed"]
+[connection signal="class_manage_pressed" from="HUD/Menu" to="." method="_on_menu_class_manage_pressed"]
 [connection signal="item_add_pressed" from="HUD/Menu" to="." method="_on_menu_item_add_pressed"]
 [connection signal="item_manage_pressed" from="HUD/Menu" to="." method="_on_menu_item_manage_pressed"]
 [connection signal="load_pressed" from="HUD/Menu" to="." method="_on_menu_load_pressed"]

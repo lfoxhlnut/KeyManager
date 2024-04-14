@@ -10,7 +10,6 @@ var info: PackedStringArray = []:
 		info = v.duplicate()
 var valid := true	# 用于判定该 Data 是否是用户输入的(逻辑由返回 Data 的函数/信号等处理)
 
-# TODO: string param, init()
 func _init(_title: String = "", _info: Array[String] = []) -> void:
 	title = _title
 	info = _info

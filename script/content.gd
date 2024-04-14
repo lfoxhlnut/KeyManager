@@ -17,7 +17,7 @@ var current_tab_info: Array[Data] = []:
 	set(v):
 		tab_info[title.current_tab] = v
 	get:
-		# 这里不需要借助 modify_arr_with_data() 是因为 set_save_data() 在添加的时候用的临时数组 t 声明了 Array[Data]
+		# 这里不需要借助 Array::assign() 是因为 set_save_data() 在添加的时候用的临时数组 t 声明了 Array[Data]
 		return tab_info[title.current_tab]
 
 @onready var title: TabBar = $Title
@@ -44,6 +44,8 @@ func initialize() -> void:
 
 
 func set_save_data(d: Dictionary, ver: String) -> void:
+	tab_title = []
+	tab_info = []
 	# 学到的: 对于这种简单的数据结构, 自己手写转换就行了, 在支持不完善的框架里尝试一劳永逸地解决这个问题会非常困难甚至不可能
 	match ver:
 		"0.0":
@@ -94,8 +96,6 @@ d = {
 	]
 }
 			"""
-			tab_title = []
-			tab_info = []
 			for i: String in d.tab_title:
 				tab_title.append(i)
 			for i: Array in d.tab_info:
@@ -205,10 +205,23 @@ func get_current_class_info() -> Data:
 	return Data.new(current_tab_title, info)
 
 
-static func modify_arr_with_data(arr: Array) -> Array[Data]:
-	# 行, 为了类型安全, 可以接受这样的写法
-	# 不明白为什么强制转换都不允许 Array -> Array[Data], 转换出错那就在转换报错呗
-	var t: Array[Data] = []
-	for i: Data in arr:
-		t.append(i)
-	return t
+ ## e.g. modified_sequence[2] = 9, 表示在新的 class 序列中, 占据下标 2 的是旧序列中下标为 9 的 class
+func rearrange_classes_sequence(modified_sequence: Array[int]) -> void:
+	#print_debug(modified_sequence)
+	if modified_sequence.size() > tab_title.size():
+		print_debug("the size of modified sequence should not be greater than original")
+		return
+	
+	var new_title: Array[String] = []
+	var new_info: Array[Array] = []
+	var new_current_id: int = 0
+	for i: int in modified_sequence:
+		new_title.append(tab_title[i])
+		new_info.append(tab_info[i])
+		if i == title.current_tab and new_current_id != -1:
+			new_current_id = i
+	
+	tab_title = new_title
+	tab_info = new_info
+	initialize()
+	title.current_tab = new_current_id

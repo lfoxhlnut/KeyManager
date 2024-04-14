@@ -6,7 +6,23 @@ signal confirmed(_data: Data)
 signal canceled
 
 
-const GROUP_NAME := "ew_body_le"
+const GROUP_NAME = "ew_body_le"
+const EwSubInfoTscn = preload("res://ui/ew_sub_info.tscn")
+
+## 额外效果: 如果为 EwSubInfo.TYPE.label, 那么 add 按钮会被隐藏
+@export var sub_info_type := EwSubInfo.TYPE.line_edit:
+	set(v):
+		if not is_node_ready():
+			await ready
+		head.type = v
+		for i: HBoxContainer in vbox.get_children():
+			var sub_info: EwSubInfo = i.get_child(0)
+			sub_info.type = v
+		sub_info_type = v
+		if v == EwSubInfo.TYPE.label:
+			add.hide()
+		else:
+			add.show()
 
 var data := Data.new():
 	set(v):
@@ -16,7 +32,7 @@ var data := Data.new():
 		data.info = v.info
 		initialize()
 
-@onready var head: LineEdit = $Head
+@onready var head: EwSubInfo = $Head
 @onready var body: Control = $Body
 @onready var vbox: VBoxContainer = $Body/ScrollContainer/VBoxContainer
 @onready var scroll_container: ScrollContainer = $Body/ScrollContainer
@@ -48,13 +64,14 @@ func create_hbox(content: String = "") -> HBoxContainer:
 	hbox.custom_minimum_size.x = vbox.custom_minimum_size.x
 	hbox.custom_minimum_size.y = 48
 	
-	var line_edit := MyLineEdit.new()
-	line_edit.add_to_group(GROUP_NAME)	# 需要保证同时只有一个 edit window 在运行才会正常
-	line_edit.anchor_left = 0
-	line_edit.text = content
-	line_edit.id = info_id
+	var sub_info: EwSubInfo = EwSubInfoTscn.instantiate()
+	sub_info.type = sub_info_type
+	sub_info.add_to_group(GROUP_NAME)	# 需要保证同时只有一个 edit window 在运行才会正常
+	sub_info.anchor_left = 0
+	sub_info.text = content
+	sub_info.id = info_id
 	info_id += 1
-	line_edit.custom_minimum_size.x = hbox.custom_minimum_size.x * 0.6
+	sub_info.custom_minimum_size.x = hbox.custom_minimum_size.x * 0.6
 	
 	var del := Button.new()
 	del.text = "delete"
@@ -65,7 +82,7 @@ func create_hbox(content: String = "") -> HBoxContainer:
 		hbox.queue_free()
 	)
 	
-	var swap := func(a: MyLineEdit, b: MyLineEdit):
+	var swap := func(a: EwSubInfo, b: EwSubInfo):
 		var s: String = a.text
 		a.text = b.text
 		b.text = s
@@ -75,22 +92,22 @@ func create_hbox(content: String = "") -> HBoxContainer:
 	move_up.text = "up"
 	move_up.pressed.connect(func():
 		# 可以保证即使只有一个节点或者该节点是最前面的节点也不会有问题
-		for i: MyLineEdit in get_lines(true):
-			if i.id < line_edit.id:	# 该节点之前第一个节点
-				swap.call(i, line_edit)
+		for i: EwSubInfo in get_lines(true):
+			if i.id < sub_info.id:	# 该节点之前第一个节点
+				swap.call(i, sub_info)
 				break
 	)
 	
 	var move_down := Button.new()
 	move_down.text = "down"
 	move_down.pressed.connect(func():
-		for i: MyLineEdit in get_lines():
-			if i.id > line_edit.id:	# 该节点之后第一个节点
-				swap.call(i, line_edit)
+		for i: EwSubInfo in get_lines():
+			if i.id > sub_info.id:	# 该节点之后第一个节点
+				swap.call(i, sub_info)
 				break
 	)
 	
-	hbox.add_child(line_edit)
+	hbox.add_child(sub_info)
 	hbox.add_child(del)
 	hbox.add_child(move_up)
 	hbox.add_child(move_down)
@@ -99,7 +116,7 @@ func create_hbox(content: String = "") -> HBoxContainer:
 
 func free_vbox() -> void:
 	for i: HBoxContainer in vbox.get_children():
-		for k: Node in i.get_children():
+		for k: Control in i.get_children():
 			k.queue_free()
 		i.queue_free()
 
@@ -111,20 +128,20 @@ func _exit_tree() -> void:
 func _on_confirm_pressed() -> void:
 	data.title = head.text
 	data.info = []
-	for i: MyLineEdit in get_lines():
+	for i: EwSubInfo in get_lines():
 		if i.text != "":	# 忽略无效项
 			data.info.append(i.text)
 	confirmed.emit(data)
 	_on_cancel_pressed()
 
 
-func get_lines(reverse: bool = false) -> Array[MyLineEdit]:
+func get_lines(reverse: bool = false) -> Array[EwSubInfo]:
 	var nodes: Array[Node] = get_tree().get_nodes_in_group(GROUP_NAME)
-	var with_type: Array[MyLineEdit] = []
-	for i: Node in nodes:
-		with_type.append(i as MyLineEdit)
+	var with_type: Array[EwSubInfo] = []
+	with_type.assign(nodes)
+	
 	with_type.sort_custom(
-		func(a: MyLineEdit, b: MyLineEdit):
+		func(a: EwSubInfo, b: EwSubInfo):
 			if reverse:
 				return a.id > b.id
 			else:

@@ -97,8 +97,9 @@ func _on_edit_save_path_pressed() -> void:
 var _res: Data = Data.new()
 # 可以考虑做成 HUD 的方法, ew 的定位可以用 center container
 ## 如果返回的 Data 的 valid 是无效的, 那么不保证 Data 的其他信息是有用的(也不保证是空的)
-func get_data_from_ew(default: Data = Data.new()) -> Data:
+func get_data_from_ew(default: Data = Data.new(), sub_info_type: EwSubInfo.TYPE = EwSubInfo.TYPE.line_edit) -> Data:
 	var ew: EditWindow = EditWindowTscn.instantiate()
+	ew.sub_info_type = sub_info_type
 	ew.data = default
 	ew.global_position = 0.5 * Global.WIN_SIZE - 0.5 * ew.size	# 这句话产生正确效果是因为 ew 的锚点在左上角
 	

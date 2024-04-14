@@ -1,0 +1,24 @@
+[gd_scene load_steps=2 format=3 uid="uid://c327jtwcs74i0"]
+
+[ext_resource type="Script" path="res://script/ew_sub_info.gd" id="1_vexxd"]
+
+[node name="EwSubInfo" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_vexxd")
+type = 1
+
+[node name="Label" type="Label" parent="."]
+visible = false
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+vertical_alignment = 1
+
+[node name="LineEdit" type="LineEdit" parent="."]
+visible = false
+layout_mode = 0
+offset_right = 67.0625
+offset_bottom = 31.0
+
+[connection signal="resized" from="." to="." method="_on_resized"]
