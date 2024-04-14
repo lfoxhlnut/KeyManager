@@ -94,9 +94,8 @@ func _on_edit_save_path_pressed() -> void:
 	file_dialog.hide()
 
 
-# 不要主动使用这个变量
 var _res: Data = Data.new()
-# 可以考虑做成 HUD 的方法
+# 可以考虑做成 HUD 的方法, ew 的定位可以用 center container
 ## 如果返回的 Data 的 valid 是无效的, 那么不保证 Data 的其他信息是有用的(也不保证是空的)
 func get_data_from_ew(default: Data = Data.new()) -> Data:
 	var ew: EditWindow = EditWindowTscn.instantiate()
@@ -117,28 +116,37 @@ func get_data_from_ew(default: Data = Data.new()) -> Data:
 
 
 # 可以考虑做成 HUD 的方法
-func get_input(placeholder: String = "") -> Array:
+var _input: String = ""
+var _valid := false
+func get_input(placeholder: String = "") -> Dictionary:
 	info_input.text = ""
 	info_input.placeholder_text = placeholder
 	center_container.show()
 	hud.exclusive_mouse = true
 	
-	# 此处写法过于丑陋, 原因在于下面的把 infoinput.txt 设置成空, 还不想设置全局变量 save_key
-	# 可考虑: 发送 confirm 的时候发送 cancel, 给 confirm 绑定回调方法, await cancel
-	# 现在能跑就不再改了
-	var res: Array = await info_input.closed
+	_input = ""
+	_valid = false
+	info_input.confirmed.connect(func(input: String):
+		_input = input
+		_valid = true
+	, CONNECT_ONE_SHOT
+	)
+	await info_input.canceled
 	center_container.hide()
 	hud.exclusive_mouse = false
 	info_input.text = ""
-	return res
+	return {
+		valid=_valid,
+		input=_input,
+	}
 
 
 func _on_save_operation_index_pressed(index: int) -> void:
 	match index:
 		SaveOp.SAVE, SaveOp.LOAD:
 			var res := await get_input("Input secret key here")
-			if not res[0] == info_input.canceled:
-				var save_key: String = res[1]["text"]
+			if res.valid:
+				var save_key: String = res.input
 				if index == SaveOp.SAVE:
 					save_pressed.emit(save_key)
 				else:

@@ -48,7 +48,7 @@ func _ready() -> void:
 
 func _on_confirm_pressed() -> void:
 	confirmed.emit(line_edit.text)
-	closed.emit(confirmed, {text=line_edit.text})
+	_on_cancel_pressed()
 
 
 func _on_resized() -> void:
@@ -59,4 +59,3 @@ func _on_resized() -> void:
 
 func _on_cancel_pressed() -> void:
 	canceled.emit()
-	closed.emit(canceled, {})

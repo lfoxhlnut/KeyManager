@@ -96,9 +96,9 @@ d = {
 			"""
 			tab_title = []
 			tab_info = []
-			for i: String in d["tab_title"]:
+			for i: String in d.tab_title:
 				tab_title.append(i)
-			for i: Array in d["tab_info"]:
+			for i: Array in d.tab_info:
 				var t: Array[Data] = []
 				for k: String in i:
 					t.append(Data.from_string(k))

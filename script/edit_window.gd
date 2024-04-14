@@ -115,7 +115,7 @@ func _on_confirm_pressed() -> void:
 		if i.text != "":	# 忽略无效项
 			data.info.append(i.text)
 	confirmed.emit(data)
-	canceled.emit()
+	_on_cancel_pressed()
 
 
 func get_lines(reverse: bool = false) -> Array[MyLineEdit]:

@@ -10,7 +10,7 @@ extends Node
 # item 文本过长如何处理
 
 func _ready() -> void:
-	_on_menu_load_pressed("111")	# 会覆盖掉 content.gd 里的测试数据
+	_on_menu_load_pressed("111")	# for test
 
 
 func _on_menu_load_pressed(save_key: String) -> void:

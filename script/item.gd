@@ -25,8 +25,6 @@ func _ready() -> void:
 	title.custom_minimum_size = head.custom_minimum_size
 	body.position.y = 64
 	size.y = head.size.y
-	# TODO: 给 item 添加一个 del 按钮, 只是这个似乎
-	# 不应该添加到 item 场景中, edit 也是, edit 的函数和 item 也没啥关系
 
 
 func initialize() -> void:
@@ -65,6 +63,7 @@ func _on_unfold_toggled(toggled_on: bool) -> void:
 	_on_head_or_body_resized()
 
 
+# 可以考虑把 edit 功能从 item 里分离
 func _on_edit_pressed() -> void:
 	var ew: EditWindow = EditWindowTscn.instantiate()
 	ew.data = data
@@ -92,7 +91,7 @@ func _on_head_or_body_resized() -> void:
 	# 这里只能用 custom_minimum_size 而非 size, 因为要放在容器里
 	# 再者, 用 size 的话, 如果写 custom_minimum_size.y = size.y, 那就二者不会再变小
 	if body.visible:
-		custom_minimum_size.x = maxf(head.size.x, body.size.x)
+		custom_minimum_size.x = maxf(head.size.x, body.size.x)	# 这样的写法也导致 custom_min_size 不会变小, 但是目前没问题就不改了
 		
 		# head 和 body 之间可能有空隙, 不能直接用 head.size.y + body.size.y
 		# BUG: 然而似乎视觉上还是有些小错误, 再说吧
