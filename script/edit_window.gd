@@ -103,6 +103,10 @@ func create_hbox(content: String = "") -> HBoxContainer:
 		for i: EwSubInfo in get_lines(true):
 			if i.id < sub_info.id:	# 该节点之前第一个节点
 				swap.call(i, sub_info)
+				
+				# Index "2" relies on how hbox adds children.
+				var i_up := i.get_parent().get_child(2) as Button
+				i_up.grab_focus()
 				break
 	)
 	
@@ -112,6 +116,10 @@ func create_hbox(content: String = "") -> HBoxContainer:
 		for i: EwSubInfo in get_lines():
 			if i.id > sub_info.id:	# 该节点之后第一个节点
 				swap.call(i, sub_info)
+				
+				# Index "3" relies on how hbox adds children.
+				var i_down := i.get_parent().get_child(3) as Button
+				i_down.grab_focus()
 				break
 	)
 	

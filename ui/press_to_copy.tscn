@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://script/press_to_copy.gd" id="1_43j4y"]
 
 [node name="PressToCopy" type="TextureButton"]
+clip_contents = true
 custom_minimum_size = Vector2(64, 0)
 offset_right = 40.0
 offset_bottom = 40.0

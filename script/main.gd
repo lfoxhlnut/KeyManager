@@ -6,8 +6,6 @@ extends Node
 # 添加注释, 或者两者一起(可能比较
 # auto save
 # 属性: 不显示
-# item 文本过长如何处理
-# ew 换序的时候保持视觉正确的控件焦点
 # Standardize comments.
 
 func _ready() -> void:
