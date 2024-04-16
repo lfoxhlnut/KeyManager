@@ -20,16 +20,23 @@ func _on_menu_load_pressed(save_key: String) -> void:
 		print_debug("no save or password err")
 		return
 	
+	print_debug(menu.save_ver)
 	match menu.save_ver:
 		"0.0":
 			content.set_save_data(res, menu.save_ver)
 		"1.0":
 			content.set_save_data(res["content"], menu.save_ver)
+		"1.1":
+			res = Global.deserialize_dict(res)
+			content.set_save_data(res["content"], menu.save_ver)
+		_:
+			print_debug("unknown version")
 
 
 func _on_menu_save_pressed(save_key: String) -> void:
-	menu.save_ver = "1.0"
-	Global.save_data(get_save_dict(), save_key, menu.save_path)
+	menu.save_ver = "1.1"
+	var to_save := Global.serialize_dict(get_save_dict())
+	Global.save_data(to_save, save_key, menu.save_path)
 
 
 func get_save_dict() -> Dictionary:

@@ -103,6 +103,9 @@ d = {
 				for k: String in i:
 					t.append(Data.from_string(k))
 				tab_info.append(t)
+		"1.1":	# 与 1.0 类似, 区别在于存档读档时借助了 Global 的 serialize..., deserialize... 方法
+			tab_title = d.tab_title
+			tab_info = d.tab_info
 		_:
 			print_debug("unknown save version")
 	

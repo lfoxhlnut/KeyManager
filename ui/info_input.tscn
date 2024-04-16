@@ -19,6 +19,7 @@ custom_minimum_size = Vector2(256, 0)
 layout_mode = 2
 placeholder_text = "input info here"
 alignment = 1
+caret_blink = true
 
 [node name="Delimiter" type="Control" parent="CenterContainer/HBoxContainer"]
 custom_minimum_size = Vector2(32, 0)

@@ -3,7 +3,6 @@ extends PanelContainer
 
 signal confirmed(text: String)
 signal canceled
-signal closed(_signal: Signal, param: Dictionary)
 
 @export var placeholder_text := "input info here":
 	set(v):

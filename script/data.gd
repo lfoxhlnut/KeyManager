@@ -19,6 +19,7 @@ func is_empty() -> bool:
 	return title.is_empty() and info.is_empty()
 
 
+# TODO: 重写此方法, 现在的阅读起来不是很友好
 func _to_string() -> String:
 	var info_str := ""
 	if info.size() > 0:

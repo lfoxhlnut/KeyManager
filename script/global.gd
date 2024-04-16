@@ -57,56 +57,137 @@ func load_save(passwd: String, save_path: String) -> Dictionary:
 	return JSON.parse_string(save_file.get_pascal_string())
 
 
-# 不适合用内置的 inst_to_dict(), 因为 JSON 默认将 Data 转换成 str, 且没有标注, 所以是不可逆的
-## 把一个字典里的所有 Data 和 Array[Data] 转换成字典(通过 Data.to_dict())
-## 假设含有一个 Data 的 Array 就是 Array[Data]
-## 假设不包含 Packed***Array 一类
-func normalize_dict(d: Dictionary) -> Dictionary:
-	var res := {}
+## 序列化字典(通过 var_to_str), 保留 Array 的类型(如果有的话)
+## 允许的变量类型可通过 type_serializable() 判定
+## 假设字典的键都是字符串类型
+static func serialize_dict(d: Dictionary) -> Dictionary:
+	var res := {
+		_type="Dictionary",
+	}
 	for key in d:
-		var val
-		if d[key] is Data:
-			val = (d[key] as Data).to_dict()
-			val["type"] = "Data"
-			print_debug("encounter data")
-		# 假设含有一个 Data 的 Array 就是 Array[Data]
-		elif d[key] is Array and d[key][0] is Data:
-			var arr: Array = d[key]
-			val = {
-				type="Array[Data]",
-				num=arr.size(),
-			}
-			print_debug("encounter arr data")
-			for i: int in arr.size():
-				val[i]=arr[i].to_dict()
-		elif d[key] is Dictionary or d[key] is Array:
-			# 嵌套的类型就递归, 此函数只处理 Data, Array[Data] 和其他末项
-			# 其实包含 packed array 也能处理, 简单点可以判断 typeof(d[key]) 的范围, 但是解码也麻烦, 暂时不涉及就不管了
-			val = normalize_dict(d[key])	# fuck, 不好处理 array 的递归, 这个函数想法暂时破产了
-			## 暂时废弃
-		else:
-			val = d[key]
+		res[key] = _serialize_element(d[key])
 		
-		res[key] = val
 	return res
 
 
-## 暂时废弃
-## 与上面的方法相对应, 把应该是 Data/Array[Data] 的字典转换成 Data/Array[Data]
-func restore_normalized_dict(d: Dictionary) -> Dictionary:
+static func type_serializable(type_id: int) -> bool:
+	return type_id <= TYPE_OBJECT or type_id in [TYPE_ARRAY, TYPE_DICTIONARY]
+
+
+## 与 serialize_dict() 类似, 序列化数组
+static func serialize_arr(arr: Array) -> Dictionary:
+	var type_id := arr.get_typed_builtin()
+	# object 之前的都是内置类型, 预期可以以合适的方式自动序列化和反序列化
+	assert(type_serializable(type_id))
+	
+	var res := {
+		_type="Array",
+		_size=arr.size(),
+		_type_id=type_id,
+	}
+	
+	# object 类型要手动处理
+	if type_id == TYPE_OBJECT:
+		# 因为目前 gd 没有获取 class_name 的方法, 只能获取基类的名称
+		res._element_base_type=arr.get_typed_class_name()
+		res._element_type = ""
+		res._element_script = arr.get_typed_script().resource_path
+		if arr is Array[Data]:
+			res._element_type = "Data"
+	
+	for id: int in arr.size():
+		res[str(id)] = _serialize_element(arr[id])
+	
+	return res
+
+
+static func _serialize_element(ele: Variant) -> Dictionary:
+	var type_id := typeof(ele)
+	assert(type_serializable(type_id))
+	var val: Dictionary
+	
+	match type_id:
+		TYPE_DICTIONARY:
+			val = serialize_dict(ele)
+		TYPE_ARRAY:
+			val = serialize_arr(ele)
+		_:
+			val = serialize_others(ele)
+			
+	return val
+
+
+## 与 serialize_dict() 类似, 序列化字典和数组(二者是容器)以外的变量
+static func serialize_others(ele: Variant) -> Dictionary:
+	var val = {
+			_type="others",	# 其实是什么都无所谓, 只要有这个字段就行
+			_type_id=typeof(ele),
+			_val=var_to_str(ele),
+		}
+	
+	# object 的子类需要手动处理, 假定只会出现 Data
+	if ele is Data:
+		val["_type"] = "Data"
+	
+	return val
+
+
+## 与 serialize_dict 方法相对应, 反序列化字典, 可以正确处理带类型的 Array
+static func deserialize_dict(d: Dictionary) -> Dictionary:
+	assert(d._type == "Dictionary")
 	var res := {}
-	for key in d:
-		var val
-		if d[key] is Dictionary and d[key].has("type"):
-			print_debug("here")
-			if d[key]["type"] == "Data":
-				val = Data.from_dict(d[key])
-				#print_debug(val)
-			else:	# d[key]["type"] == "Array[Data]"
-				val = []
-				for i: int in d[key]["num"]:
-					val.append(Data.from_dict(d[key][i] as Dictionary))
-		else:
-			val = d[key]
-		res[key] = val
+	
+	for key: String in d:
+		if key == "_type":
+			continue
+		res[key] = _deserialize_element(d[key])
+	
 	return res
+
+
+## 类似 deserialize_dict(), 反序列化数组
+static func deserialize_arr(d: Dictionary) -> Array:
+	assert(d._type == "Array")
+	var res: Array
+	d._type_id = d._type_id as int
+	d._size = d._size as int
+	
+	# 给数组赋上类型, object 的子类(暂时只有 Data)需要手动处理
+	if d._type_id == TYPE_OBJECT:
+#print(Array([], TYPE_OBJECT, "RefCounted", load("res://script/data.gd")) is Array[Data]) # true
+		var script = null
+		if d._element_type == "Data":
+			script = load(d._element_script)
+		# 这里必须手动转换成 string name 类型, 不然会报错, 很奇怪, 为什么这里不能自动转换呢
+		res = Array([], TYPE_OBJECT, StringName(d._element_base_type), script)
+	else:
+		res = Array([], d._type_id, "", null)
+	
+	for id: int in range(d._size):
+		res.append(_deserialize_element(d[str(id)]))
+	return res
+
+
+static func _deserialize_element(ele: Dictionary) -> Variant:
+	assert(ele.has("_type"))
+	var val
+	match ele._type:
+		"Dictionary":
+			val = deserialize_dict(ele)
+		"Array":
+			val = deserialize_arr(ele)
+		_:
+			val = deserialize_others(ele)
+	return val
+
+
+## 类似 deserialize_dict(), 反序列化字典和数组以外的变量
+static func deserialize_others(ele: Dictionary) -> Variant:
+	ele._type_id = ele._type_id as int
+	var val = str_to_var(ele._val)
+	
+	if ele._type_id == TYPE_OBJECT:
+		if ele._type == "Data":
+			return val as Data
+	
+	return type_convert(val, ele._type_id)
