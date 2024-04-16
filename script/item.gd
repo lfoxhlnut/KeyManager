@@ -68,15 +68,16 @@ func _on_edit_pressed() -> void:
 	var ew: EditWindow = EditWindowTscn.instantiate()
 	ew.data = data
 	
-	ew.resized.connect(func():
+	var center_ew := func():
 		ew.global_position = 0.5 * Global.WIN_SIZE - 0.5 * ew.size
-	)
+	ew.resized.connect(center_ew)
 	
 	# 现在这样写也行, 也可考虑用 menu(或者将来可能是 hud)的方法 get data from ew
 	ew.confirmed.connect(func(_data: Data):
 		data = _data
 		data_modified.emit()
 	)
+	center_ew.call()
 	Global.get_hud().add_child(ew)
 	Global.get_hud().exclusive_mouse = true
 	
