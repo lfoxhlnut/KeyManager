@@ -5,7 +5,7 @@ signal confirmed(_data: Data)
 ## canceled will emit automatically after confirmed emit
 signal canceled
 
-
+# NOTE: 已不记得是否有必要用 group 了, 似乎这里 group 的用法有潜在的问题, 重构时要注意
 const GROUP_NAME = "ew_body_le"
 const EwSubInfoTscn = preload("res://ui/ew_sub_info.tscn")
 
@@ -24,6 +24,9 @@ const EwSubInfoTscn = preload("res://ui/ew_sub_info.tscn")
 		else:
 			add.show()
 
+## 如果为 true, 那么 ew 在被创建的时候会自动聚焦焦点至 title 的输入框
+## 且按下 add 按钮后会自动聚焦到新创建的输入框
+@export var auto_grab_focus := true
 var data := Data.new():
 	set(v):
 		if not is_node_ready():
@@ -46,7 +49,9 @@ func _ready() -> void:
 	head.size.x = size.x
 	head.size.y = 48
 	vbox.custom_minimum_size.x = scroll_container.size.x
-	#data = Data.new("title ff", ["info1", "info3", "fffff中文ffffff"])
+	
+	if auto_grab_focus:
+		title_grab_focus()
 
 
 func initialize() -> void:
@@ -56,6 +61,9 @@ func initialize() -> void:
 	
 	for i: String in data.info:
 		vbox.add_child(create_hbox(i))
+	
+	if auto_grab_focus:
+		title_grab_focus()
 
 
 func create_hbox(content: String = "") -> HBoxContainer:
@@ -152,7 +160,29 @@ func get_lines(reverse: bool = false) -> Array[EwSubInfo]:
 
 func _on_add_pressed() -> void:
 	vbox.add_child(create_hbox())
+	if auto_grab_focus:
+		info_grab_focus(-1)
 
 
 func _on_cancel_pressed() -> void:
 	canceled.emit()
+
+
+## Set focus to input area of info.
+## The info will be accessed from lase one if the index is negative.
+## Nothing happens if the index is out of bound.
+func info_grab_focus(id: int) -> void:
+	# vbox 没有子节点的情况包含在内
+	if id >= vbox.get_child_count() or id < -vbox.get_child_count():
+		return
+	if id == -1:
+		head.focus_input_area()
+	else:
+		var hbox: HBoxContainer = vbox.get_child(id)
+		var sub_info: EwSubInfo = hbox.get_child(0)
+		sub_info.focus_input_area()
+
+
+## Set focus to input area of title
+func title_grab_focus() -> void:
+	head.focus_input_area()

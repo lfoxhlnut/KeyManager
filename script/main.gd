@@ -8,6 +8,7 @@ extends Node
 # 属性: 不显示
 # item 文本过长如何处理
 # ew 换序的时候保持视觉正确的控件焦点
+# Standardize comments.
 
 func _ready() -> void:
 	_on_menu_load_pressed("111")	# for test

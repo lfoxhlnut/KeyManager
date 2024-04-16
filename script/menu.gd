@@ -124,6 +124,7 @@ func get_input(placeholder: String = "") -> Dictionary:
 	info_input.placeholder_text = placeholder
 	center_container.show()
 	hud.exclusive_mouse = true
+	info_input.focus_input_area()
 	
 	_input = ""
 	_valid = false

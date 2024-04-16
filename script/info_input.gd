@@ -58,3 +58,7 @@ func _on_resized() -> void:
 
 func _on_cancel_pressed() -> void:
 	canceled.emit()
+
+
+func focus_input_area() -> void:
+	line_edit.call_deferred("grab_focus")

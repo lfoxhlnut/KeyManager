@@ -60,7 +60,7 @@ func load_save(passwd: String, save_path: String) -> Dictionary:
 ## 序列化字典(通过 var_to_str), 保留 Array 的类型(如果有的话)
 ## 允许的变量类型可通过 type_serializable() 判定
 ## 假设字典的键都是字符串类型
-static func serialize_dict(d: Dictionary) -> Dictionary:
+func serialize_dict(d: Dictionary) -> Dictionary:
 	var res := {
 		_type="Dictionary",
 	}
@@ -70,12 +70,12 @@ static func serialize_dict(d: Dictionary) -> Dictionary:
 	return res
 
 
-static func type_serializable(type_id: int) -> bool:
+func type_serializable(type_id: int) -> bool:
 	return type_id <= TYPE_OBJECT or type_id in [TYPE_ARRAY, TYPE_DICTIONARY]
 
 
 ## 与 serialize_dict() 类似, 序列化数组
-static func serialize_arr(arr: Array) -> Dictionary:
+func serialize_arr(arr: Array) -> Dictionary:
 	var type_id := arr.get_typed_builtin()
 	# object 之前的都是内置类型, 预期可以以合适的方式自动序列化和反序列化
 	assert(type_serializable(type_id))
@@ -101,7 +101,7 @@ static func serialize_arr(arr: Array) -> Dictionary:
 	return res
 
 
-static func _serialize_element(ele: Variant) -> Dictionary:
+func _serialize_element(ele: Variant) -> Dictionary:
 	var type_id := typeof(ele)
 	assert(type_serializable(type_id))
 	var val: Dictionary
@@ -118,7 +118,7 @@ static func _serialize_element(ele: Variant) -> Dictionary:
 
 
 ## 与 serialize_dict() 类似, 序列化字典和数组(二者是容器)以外的变量
-static func serialize_others(ele: Variant) -> Dictionary:
+func serialize_others(ele: Variant) -> Dictionary:
 	var val = {
 			_type="others",	# 其实是什么都无所谓, 只要有这个字段就行
 			_type_id=typeof(ele),
@@ -133,7 +133,7 @@ static func serialize_others(ele: Variant) -> Dictionary:
 
 
 ## 与 serialize_dict 方法相对应, 反序列化字典, 可以正确处理带类型的 Array
-static func deserialize_dict(d: Dictionary) -> Dictionary:
+func deserialize_dict(d: Dictionary) -> Dictionary:
 	assert(d._type == "Dictionary")
 	var res := {}
 	
@@ -146,7 +146,7 @@ static func deserialize_dict(d: Dictionary) -> Dictionary:
 
 
 ## 类似 deserialize_dict(), 反序列化数组
-static func deserialize_arr(d: Dictionary) -> Array:
+func deserialize_arr(d: Dictionary) -> Array:
 	assert(d._type == "Array")
 	var res: Array
 	d._type_id = d._type_id as int
@@ -168,7 +168,7 @@ static func deserialize_arr(d: Dictionary) -> Array:
 	return res
 
 
-static func _deserialize_element(ele: Dictionary) -> Variant:
+func _deserialize_element(ele: Dictionary) -> Variant:
 	assert(ele.has("_type"))
 	var val
 	match ele._type:
@@ -182,7 +182,7 @@ static func _deserialize_element(ele: Dictionary) -> Variant:
 
 
 ## 类似 deserialize_dict(), 反序列化字典和数组以外的变量
-static func deserialize_others(ele: Dictionary) -> Variant:
+func deserialize_others(ele: Dictionary) -> Variant:
 	ele._type_id = ele._type_id as int
 	var val = str_to_var(ele._val)
 	
