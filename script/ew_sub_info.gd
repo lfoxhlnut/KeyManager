@@ -29,7 +29,6 @@ var text: String:
 	set(v):
 		for i: Control in get_children():
 			i.text = v
-		text = v
 		if not is_node_ready():
 			await ready
 		
@@ -37,6 +36,8 @@ var text: String:
 		# 手动操作是因为可能 text 赋值在使用 focus_input_area() 之后,
 		# 这样光标位置与文本长度对不上
 		line_edit.caret_column = text.length()
+	get:
+		return line_edit.text
 var id: int
 
 
