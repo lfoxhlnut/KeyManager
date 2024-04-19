@@ -183,12 +183,9 @@ func info_grab_focus(id: int) -> void:
 	# vbox 没有子节点的情况包含在内
 	if id >= vbox.get_child_count() or id < -vbox.get_child_count():
 		return
-	if id == -1:
-		head.focus_input_area()
-	else:
-		var hbox: HBoxContainer = vbox.get_child(id)
-		var sub_info: EwSubInfo = hbox.get_child(0)
-		sub_info.focus_input_area()
+	var hbox: HBoxContainer = vbox.get_child(id)
+	var sub_info: EwSubInfo = hbox.get_child(0)
+	sub_info.focus_input_area()
 
 
 ## Set focus to input area of title
