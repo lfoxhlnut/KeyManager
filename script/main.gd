@@ -1,6 +1,7 @@
 extends Node
 @onready var content: Content = $Content
 @onready var menu: Menu = $HUD/Menu
+@onready var hud: HUD = $HUD
 
 # TODO:
 # 添加注释, 或者两者一起(可能比较
@@ -45,9 +46,15 @@ func get_save_dict() -> Dictionary:
 	return save_dict
 
 
-func _on_menu_item_add_pressed(data: Data) -> void:
-	# 空的数据不被承认
-	if not data.is_empty():
+func _on_menu_item_add_pressed() -> void:
+	if content.is_empty():
+		hud.warn("No class now. Add a class first.")
+		return
+	
+	var data := await menu.get_data_from_ew()
+	
+	# Permit if data is valid and not empty.
+	if data.valid and not data.is_empty():
 		content.add_item(data)
 
 
@@ -57,6 +64,9 @@ func _on_menu_class_add_pressed(data: Data) -> void:
 
 
 func _on_menu_item_manage_pressed() -> void:
+	if content.is_empty():
+		hud.warn("No class now.")
+		return
 	var old_data := content.get_current_class_info()
 	var modified := await menu.get_data_from_ew(old_data)
 	
@@ -66,6 +76,9 @@ func _on_menu_item_manage_pressed() -> void:
 
 
 func _on_menu_class_manage_pressed() -> void:
+	if content.is_empty():
+		hud.warn("No class now.")
+		return
 	var original := Data.new("", content.tab_title)
 	
 	var modified := await menu.get_data_from_ew(original, EwSubInfo.TYPE.label)

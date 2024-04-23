@@ -3,7 +3,7 @@ extends Control
 
 signal save_pressed(save_key: String)
 signal load_pressed(save_key: String)
-signal item_add_pressed(data: Data)
+signal item_add_pressed()
 signal item_manage_pressed
 signal class_add_pressed(data: Data)
 signal class_manage_pressed
@@ -29,9 +29,13 @@ const ClassOpText = [
 	"Add class",
 	"Manage classes"
 ]
-@onready var save_operation: PopupMenu = $"MenuBar/Save Operation"
-@onready var item_operation: PopupMenu = $"MenuBar/Item Operation"
-@onready var class_operation: PopupMenu = $"MenuBar/Class Operation"
+@onready var save_btn: MenuButton = $HBoxContainer/SaveOperation
+@onready var item_btn: MenuButton = $HBoxContainer/ItemOperation
+@onready var class_btn: MenuButton = $HBoxContainer/ClassOperation
+# Still couldn't resize popup menu. To build a new one.
+@onready var save_popup: PopupMenu = save_btn.get_popup()
+@onready var item_popup: PopupMenu = item_btn.get_popup()
+@onready var class_popup: PopupMenu = class_btn.get_popup()
 @onready var info_input: InfoInput = $CenterContainer/InfoInput
 @onready var file_dialog: FileDialog = $FileDialog
 @onready var hud: HUD = $".."
@@ -42,27 +46,34 @@ var save_ver := ""
 
 
 func _ready() -> void:
-	center_container.size = Global.WIN_SIZE
-	info_input.custom_minimum_size = Global.WIN_SIZE * 0.6
-	info_input.input_size = Vector2(size.x * 0.4, size.x * 0.1)
-	@warning_ignore("narrowing_conversion")
-	file_dialog.size.x = 0.75 * size.x
-	@warning_ignore("narrowing_conversion")
-	file_dialog.size.y = 0.4 * size.x	# 这里用的是 size.x, 只能保证 menu 的宽度和屏幕一样
-	file_dialog.position = 0.5 * (Global.WIN_SIZE - (file_dialog.size as Vector2))	# 居中
-
-	
-	set_popup_menu_item_text()
 	load_config()
+	center_container.size = Global.WIN_SIZE
+	info_input.input_size = Vector2(Global.WIN_WIDTH * 0.4, Global.WIN_HEIGHT * 0.05)
+	
+	info_input.custom_minimum_size = Vector2(Global.WIN_WIDTH * 0.9, Global.WIN_HEIGHT * 0.05 + 32) 
+	
+	# TODO: A component(node) that apply percentage size to its parent.
+	@warning_ignore("narrowing_conversion")
+	file_dialog.size.x = 0.75 * Global.WIN_WIDTH
+	@warning_ignore("narrowing_conversion")
+	file_dialog.size.y = 0.8 * Global.WIN_HEIGHT
+	set_popup_menu_item_text()
+	save_popup.index_pressed.connect(_on_save_operation_index_pressed)
+	item_popup.index_pressed.connect(_on_item_operation_index_pressed)
+	class_popup.index_pressed.connect(_on_class_operation_index_pressed)
+
+
+func center_file_dialog() -> void:
+	file_dialog.position = 0.5 * (Global.WIN_SIZE - (file_dialog.size as Vector2))
 
 
 func set_popup_menu_item_text() -> void:
 	for i: String in SaveOpText:
-		save_operation.add_item(i)
+		save_popup.add_item(i)
 	for i: String in ItemOpText:
-		item_operation.add_item(i)
+		item_popup.add_item(i)
 	for i: String in ClassOpText:
-		class_operation.add_item(i)
+		class_popup.add_item(i)
 
 
 func load_config() -> void:
@@ -86,6 +97,7 @@ func save_config() -> void:
 
 func _on_edit_save_path_pressed() -> void:
 	file_dialog.current_dir = ProjectSettings.globalize_path(save_path)
+	center_file_dialog()
 	file_dialog.show()
 	var s: String = await file_dialog.dir_selected
 	if not s.is_empty():
@@ -156,8 +168,8 @@ func _on_save_operation_index_pressed(index: int) -> void:
 		SaveOp.EDIT_PATH:
 			_on_edit_save_path_pressed()
 		SaveOp.OPEN_PATH:
-			# NOTE: ↓ 未在 android 上实现, 不行就试试 shell_open()
-			OS.shell_show_in_file_manager(ProjectSettings.globalize_path(save_path), true)
+			# Still doesn't work on android.
+			OS.shell_open(ProjectSettings.globalize_path(save_path))
 		_:
 			print_debug("unexpected index: ", index)
 
@@ -165,9 +177,7 @@ func _on_save_operation_index_pressed(index: int) -> void:
 func _on_item_operation_index_pressed(index: int) -> void:
 	match index:
 		ItemOp.ADD:
-			var d := await get_data_from_ew()
-			if d.valid:
-				item_add_pressed.emit(d)
+			item_add_pressed.emit()
 		ItemOp.MANAGE:
 			item_manage_pressed.emit()
 		_:

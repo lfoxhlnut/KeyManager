@@ -2,17 +2,19 @@ extends Node
 
 const DEBUG = true
 
-# NOTE:这些似乎有问题/
-#var WIN_WIDTH: float = ProjectSettings.get_setting("display/window/size/viewport_width")
-#var WIN_HEIGHT: float = ProjectSettings.get_setting("display/window/size/viewport_height")
-#var WIN_SIZE: Vector2:
-	#get:
-		#return Vector2(WIN_WIDTH, WIN_HEIGHT)
-
-
-const WIN_WIDTH = 1080
-const WIN_HEIGHT = 640
-const WIN_SIZE = Vector2(WIN_WIDTH, WIN_HEIGHT)
+var WIN_WIDTH: float:
+	get:
+		if OS.has_feature("editor"):
+			return ProjectSettings.get_setting("display/window/size/window_width_override")
+		return ProjectSettings.get_setting("display/window/size/viewport_width")
+var WIN_HEIGHT: float:
+	get:
+		if OS.has_feature("editor"):
+			return ProjectSettings.get_setting("display/window/size/window_height_override")
+		return ProjectSettings.get_setting("display/window/size/viewport_height")
+var WIN_SIZE: Vector2:
+	get:
+		return Vector2(WIN_WIDTH, WIN_HEIGHT)
 
 const DEFAULT_SAVE_PATH = "user://"
 const DEFAULT_SAVE_FILENAME = "save.dat"
@@ -26,7 +28,13 @@ func _ready() -> void:
 
 	if err != OK:
 		print_debug("fail to load config file. err code: ", err)
-
+	
+	@warning_ignore("unused_variable")
+	var max_size := DisplayServer.screen_get_usable_rect().size
+	
+	match OS.get_name():
+		"Android":
+			pass
 
 func _exit_tree() -> void:
 	save_config()

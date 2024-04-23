@@ -8,7 +8,7 @@ const ItemTscn := preload("res://ui/item.tscn")
 var tab_title: Array[String] = []
 var tab_info: Array[Array] = []
 # 学到的: 这里封装 current_... 使得下次修改存档版本会变得简单得多
-var current_tab_title: String = "":
+var current_tab_title: String:
 	set(v):
 		tab_title[title.current_tab] = v
 	get:
@@ -178,6 +178,8 @@ func add_class(data: Data) -> void:
 	
 
 func modify_current_class(modified: Data) -> void:
+	if is_empty():
+		return
 	var res: Array[Data] = []
 	
 	# 判断当前 class 修改后是否与其他的 class 冲突
@@ -228,3 +230,7 @@ func rearrange_classes_sequence(modified_sequence: Array[int]) -> void:
 	tab_info = new_info
 	initialize()
 	title.current_tab = new_current_id
+
+
+func is_empty() -> bool:
+	return tab_title.is_empty()

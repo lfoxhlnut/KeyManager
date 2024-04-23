@@ -1,6 +1,10 @@
-[gd_scene load_steps=2 format=3 uid="uid://d2sdwnvlwhspu"]
+[gd_scene load_steps=3 format=3 uid="uid://d2sdwnvlwhspu"]
 
 [ext_resource type="Script" path="res://script/global.gd" id="1_mslls"]
+[ext_resource type="Script" path="res://script/auto_run.gd" id="2_aut2g"]
 
 [node name="Global" type="Node"]
 script = ExtResource("1_mslls")
+
+[node name="AutoRun" type="Node" parent="."]
+script = ExtResource("2_aut2g")
