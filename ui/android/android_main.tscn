@@ -1,0 +1,156 @@
+[gd_scene load_steps=8 format=3 uid="uid://dhg11qrbe510d"]
+
+[ext_resource type="Script" path="res://script/android/android_main.gd" id="1_powmy"]
+[ext_resource type="Script" path="res://script/content.gd" id="2_t4wwx"]
+[ext_resource type="PackedScene" uid="uid://k5r1oyboiqjk" path="res://ui/hud.tscn" id="3_vk3p4"]
+[ext_resource type="Script" path="res://script/android/android_menu.gd" id="4_qjvv8"]
+[ext_resource type="Script" path="res://script/android/menu_btn.gd" id="5_4s6ew"]
+[ext_resource type="Script" path="res://resource/sub_node_percentage.gd" id="6_tho04"]
+
+[sub_resource type="Resource" id="Resource_tyjth"]
+script = ExtResource("6_tho04")
+percentage/first_part = 20
+percentage/second_part = 50
+
+[node name="Main" type="Node"]
+script = ExtResource("1_powmy")
+
+[node name="Content" type="Control" parent="."]
+layout_mode = 3
+anchor_top = 0.101667
+anchor_right = 1.0
+anchor_bottom = 0.929167
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_t4wwx")
+metadata/_edit_use_anchors_ = true
+
+[node name="Title" type="TabBar" parent="Content"]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 64.0
+grow_horizontal = 2
+tab_alignment = 1
+
+[node name="CenterContainer" type="CenterContainer" parent="Content"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Content/CenterContainer"]
+layout_mode = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Content/CenterContainer/ScrollContainer"]
+layout_mode = 2
+
+[node name="HUD" parent="." instance=ExtResource("3_vk3p4")]
+
+[node name="Menu" type="Control" parent="HUD"]
+layout_mode = 3
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -320.0
+grow_horizontal = 2
+grow_vertical = 0
+script = ExtResource("4_qjvv8")
+
+[node name="MenuBtn" type="HBoxContainer" parent="HUD/Menu"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -78.0
+grow_horizontal = 2
+grow_vertical = 0
+script = ExtResource("5_4s6ew")
+percentage = SubResource("Resource_tyjth")
+
+[node name="SaveOp" type="Button" parent="HUD/Menu/MenuBtn"]
+custom_minimum_size = Vector2(214.4, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Save operation"
+
+[node name="ItemOp" type="Button" parent="HUD/Menu/MenuBtn"]
+custom_minimum_size = Vector2(536, 0)
+layout_mode = 2
+text = "Item operation"
+
+[node name="ClassOp" type="Button" parent="HUD/Menu/MenuBtn"]
+custom_minimum_size = Vector2(321.6, 0)
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Class operation"
+
+[node name="SubMenuBtn" type="Control" parent="HUD/Menu"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 109.0
+grow_horizontal = 2
+
+[node name="SaveOperation" type="HBoxContainer" parent="HUD/Menu/SubMenuBtn"]
+layout_mode = 2
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 31.0
+
+[node name="Save" type="Button" parent="HUD/Menu/SubMenuBtn/SaveOperation"]
+layout_mode = 2
+text = "Save"
+
+[node name="Load" type="Button" parent="HUD/Menu/SubMenuBtn/SaveOperation"]
+layout_mode = 2
+text = "Load
+"
+
+[node name="EditSavePath" type="Button" parent="HUD/Menu/SubMenuBtn/SaveOperation"]
+layout_mode = 2
+text = "Edit save path"
+
+[node name="ItemOperation" type="HBoxContainer" parent="HUD/Menu/SubMenuBtn"]
+layout_mode = 2
+offset_right = 213.0
+offset_bottom = 31.0
+
+[node name="Add" type="Button" parent="HUD/Menu/SubMenuBtn/ItemOperation"]
+layout_mode = 2
+text = "Add a item"
+
+[node name="Manage" type="Button" parent="HUD/Menu/SubMenuBtn/ItemOperation"]
+layout_mode = 2
+text = "Manage items"
+
+[node name="ClassOperation" type="HBoxContainer" parent="HUD/Menu/SubMenuBtn"]
+layout_mode = 2
+
+[node name="Add" type="Button" parent="HUD/Menu/SubMenuBtn/ClassOperation"]
+layout_mode = 2
+text = "Add a class"
+
+[node name="Manage" type="Button" parent="HUD/Menu/SubMenuBtn/ClassOperation"]
+layout_mode = 2
+text = "Manage classes"
+
+[connection signal="resized" from="Content/Title" to="Content" method="_on_title_resized"]
+[connection signal="tab_changed" from="Content/Title" to="Content" method="_on_title_tab_changed"]
+[connection signal="class_add_pressed" from="HUD/Menu" to="." method="_on_menu_class_add_pressed"]
+[connection signal="class_manage_pressed" from="HUD/Menu" to="." method="_on_menu_class_manage_pressed"]
+[connection signal="item_add_pressed" from="HUD/Menu" to="." method="_on_menu_item_add_pressed"]
+[connection signal="item_manage_pressed" from="HUD/Menu" to="." method="_on_menu_item_manage_pressed"]
+[connection signal="load_pressed" from="HUD/Menu" to="." method="_on_menu_load_pressed"]
+[connection signal="save_pressed" from="HUD/Menu" to="." method="_on_menu_save_pressed"]
+[connection signal="resized" from="HUD/Menu/MenuBtn" to="HUD/Menu/MenuBtn" method="_on_resized"]
+[connection signal="pressed" from="HUD/Menu/SubMenuBtn/SaveOperation/Save" to="HUD/Menu" method="_on_save_sub_btn_pressed" binds= ["save"]]
+[connection signal="pressed" from="HUD/Menu/SubMenuBtn/SaveOperation/Load" to="HUD/Menu" method="_on_save_sub_btn_pressed" binds= ["load"]]
+[connection signal="pressed" from="HUD/Menu/SubMenuBtn/SaveOperation/EditSavePath" to="HUD/Menu" method="_on_save_sub_btn_pressed" binds= ["edit_save_path"]]
+[connection signal="pressed" from="HUD/Menu/SubMenuBtn/ItemOperation/Add" to="HUD/Menu" method="_on_item_sub_btn_pressed" binds= ["add"]]
+[connection signal="pressed" from="HUD/Menu/SubMenuBtn/ItemOperation/Manage" to="HUD/Menu" method="_on_item_sub_btn_pressed" binds= ["manage"]]
+[connection signal="pressed" from="HUD/Menu/SubMenuBtn/ClassOperation/Add" to="HUD/Menu" method="_on_class_sub_btn_pressed" binds= ["add"]]
+[connection signal="pressed" from="HUD/Menu/SubMenuBtn/ClassOperation/Manage" to="HUD/Menu" method="_on_class_sub_btn_pressed" binds= ["manage"]]

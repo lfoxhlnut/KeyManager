@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="KeyManager"
-run/main_scene="res://ui/main.tscn"
+run/main_scene="res://ui/android/android_main.tscn"
 config/use_custom_user_dir=true
 config/custom_user_dir_name="Bluewave111/KeyManager"
 config/features=PackedStringArray("4.2", "Forward Plus")
@@ -25,6 +25,7 @@ Global="*res://global/global.tscn"
 
 window/size/viewport_width=1080
 window/size/viewport_height=2400
+window/size/always_on_top=true
 window/size/window_width_override=540
 window/size/window_height_override=1200
 window/handheld/orientation=1
