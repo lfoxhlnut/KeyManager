@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3 uid="uid://dahjaq1efto"]
+
+[ext_resource type="Script" path="res://script/allocate_space_for_children.gd" id="1_y8la5"]
+[ext_resource type="Resource" uid="uid://bpoqvv2ltos3t" path="res://tmp/sub_node_precentage.tres" id="2_odfi5"]
+
+[node name="AllocateSpaceForChildren" type="Node"]
+script = ExtResource("1_y8la5")
+percentage = ExtResource("2_odfi5")

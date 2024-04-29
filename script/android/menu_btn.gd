@@ -44,11 +44,6 @@ func set_sub_node_size() -> void:
 	var second := item_op.get_minimum_size().x / disposable * 100
 	var third := class_op.get_minimum_size().x / disposable * 100
 	
-	print_debug("min scale is: (%s, %s, %s)" % [
-		first,
-		second,
-		third,
-	])
 	# 还需要注意他们的和不能超过 100
 	var remaining := 100 - first - second - third
 	# 按顺序把可用空间分配出去.
@@ -76,11 +71,6 @@ func set_sub_node_size() -> void:
 	# 最后一个直接取用剩下的所有空间
 	third += remaining
 	
-	print_debug("after allocating, the scale is: (%s, %s, %s)" % [
-		first,
-		second,
-		third,
-	])
 	# 重构要换成数组写法, 即使只有三个也是数组写起来更好
 	percentage.first_part = int(first)
 	percentage.second_part = int(second)
@@ -92,25 +82,10 @@ func set_sub_node_size() -> void:
 	
 	# 以上任何一点不做到, 都会在调整过程中让父级的 size.x 变大.
 	# (然后就变不回去了, 单调不减, 子节点也相应的会变大, 大家都越来越大)
-	print_debug("before change, size.x is ", size.x)
 	save_op.custom_minimum_size.x = disposable * first / 100.0
 	item_op.custom_minimum_size.x = disposable * second / 100.0
 	class_op.custom_minimum_size.x = disposable * third / 100.0
 	
-	print_debug("(%s, %s, %s), sum = %s" % [
-		save_op.custom_minimum_size.x,
-		item_op.custom_minimum_size.x,
-		class_op.custom_minimum_size.x,
-		save_op.custom_minimum_size.x + item_op.custom_minimum_size.x + class_op.custom_minimum_size.x,
-	])
-	#print_debug("(%s, %s, %s)" % [
-		#percentage.first_part,
-		#percentage.second_part,
-		#percentage.third_part,
-	#])
-	#save_op.size.x = size.x * percentage.first_part / 100.0
-	#item_op.size.x = size.x * percentage.second_part / 100.0
-	#class_op.size.x = size.x * percentage.third_part / 100.0
 	
 
 
