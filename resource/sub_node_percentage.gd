@@ -49,13 +49,9 @@ func _get_property_list() -> Array[Dictionary]:
 			usage=PROPERTY_USAGE_STORAGE,
 		},
 	]
-	if size == 0:
-		return res
 	
 	percentage.resize(size)
 	infimum.resize(size)
-	var sum := 0
-	var infimum_sum := 0
 	
 	for id: int in size:
 		var d := {
@@ -63,10 +59,8 @@ func _get_property_list() -> Array[Dictionary]:
 			type=TYPE_INT,
 			usage=PROPERTY_USAGE_EDITOR,
 			hint=PROPERTY_HINT_RANGE,
-			#hint_string="%s,%s" % [infimum[id], 100 - sum],
-			hint_string="%s,%s" % [0, 100],
+			hint_string="0, 100",
 		}
-		sum += percentage[id]
 		res.append(d)
 		
 		d = {
@@ -74,10 +68,8 @@ func _get_property_list() -> Array[Dictionary]:
 			type=TYPE_INT,
 			usage=PROPERTY_USAGE_EDITOR,
 			hint=PROPERTY_HINT_RANGE,
-			hint_string="%s,%s" % [0, 100],
-			#hint_string="%s,%s" % [0, 100 - infimum_sum],
+			hint_string="0, 100",
 		}
-		infimum_sum += infimum[id]
 		res.append(d)
 	return res
 
@@ -86,23 +78,11 @@ func _get(property: StringName):
 	if property.begins_with("percentage/"):
 		property = property.trim_prefix("percentage/")
 		var id := int(property as String)
-		#if percentage[id] < infimum[id]:
-			#percentage[id] = infimum[id]
 		return percentage[id]
 	if property.begins_with("infimum/"):
 		property = property.trim_prefix("infimum/")
 		var id := int(property as String)
 		return infimum[id]
-	
-	# No use if get() and set() behave the same.
-	# (See comments at _set())
-	#match property:
-		#"size":
-			#return size
-		#"infimum":
-			#return infimum
-		#"percentage":
-			#return percentage
 	
 	return null
 
@@ -115,28 +95,9 @@ func _set(property: StringName, value: Variant) -> bool:
 		property = property.trim_prefix("percentage/")
 		var id := int(property as String)
 		
-		# 可自由分配的空间余量.
-		var upper_bound := disposable
-		
-		# 减去 id 前每一项额外占用的部分.
-		for i: int in id:
-			upper_bound -= percentage[i] - infimum[i]
-		
 		# 这一行为了不去单独处理 id 这个下标
 		percentage[id] = value
-		
-		# 重新分配 id 及之后的每一项
-		for i: int in range(id, size):
-			# Is it necessary when the editor's hint existed?
-			
-			# 需要判断的是额外申请的空间是否足够
-			# TODO: 这样写是有点绕, 可考虑percentage 分解成 infimum + addition
-			if percentage[i] - infimum[i] <= upper_bound:
-				upper_bound -= percentage[i] - infimum[i]
-			else:
-				percentage[i] = infimum[i]
-				upper_bound = 0
-			assert(upper_bound >= 0)
+		adjust_percentage()
 		
 		notify_property_list_changed()
 		emit_changed()
@@ -154,26 +115,39 @@ func _set(property: StringName, value: Variant) -> bool:
 		for i: int in id:
 			upper_bound -= infimum[i]
 		
-		print_debug("upper_bound in infimum:", upper_bound)
 		# 为了不去单独处理 id 这个下标
 		infimum[id] = value
 		
-		# Is it necessary when the editor's hint existed?
-		# 奇怪, 如果把 size 改成 id + 1(即, 只修改 id 这一个下标, 目的是测试检查器
-		# 是否能自动更新限制范围(通过 hint string))
-		# 但是发现如果这样做, percentage 不会完全跟着自动更新, 并且 id 之外的 infimum
-		# 似乎有了 "记忆性". e.g. 初始: percentage: 10, 55. infi: 3, 55.
-		# 修改 infi: 3 -> 90, 得到: per: 90, 55. infi: 90, 10.
-		# 再次修改: infi: 90 -> 6, 得到: per: 10, 55. infi: 6, 55.
-		# upd: 发现原因: 数据记录在 percentage[id], 但是 get 得到的 percentage/id
-		# 会被 hint_string 限制范围.
 		for i: int in range(id, size):
 			infimum[i] = clampi(infimum[i], 0, upper_bound)
 			upper_bound -= infimum[i]
+		
+		# 需要在此处手动调节. 在 _get() 里调节有些浪费性能.
+		adjust_percentage()
+		
 		notify_property_list_changed()
 		emit_changed()
-		# Percentage will adapt automatically.
-		_set("percentage/0", percentage[0])
 		return true
 
 	return false
+
+
+func adjust_percentage() -> void:
+	print_debug("adjusting percentage")
+	# 可自由分配的空间余量.
+	var upper_bound := disposable
+	
+	# Reallocate for each element. Give priority to smaller index elements.
+	for i: int in size:
+		# TODO: 这样写是有点绕, 可考虑把 percentage 分解成 infimum + addition
+		# 保证 percentage[i] 至少分配到 infimum[i] 大小的空间.
+		if percentage[i] < infimum[i]:
+			percentage[i] = infimum[i]
+		# 如果额外申请的空间在允许范围内.
+		elif percentage[i] - infimum[i] <= upper_bound:
+			upper_bound -= percentage[i] - infimum[i]
+		# 申请超过允许范围, 最多把所有剩余空间都分配给它.
+		else:
+			percentage[i] = upper_bound + infimum[i]
+			upper_bound = 0
+		assert(upper_bound >= 0)
