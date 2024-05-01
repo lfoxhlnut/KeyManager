@@ -122,11 +122,13 @@ func adjust_sub_control_node(_i: int = 1) -> void:
 	# Set to zero first to prevent overflow(prevent parent size changing) in assignment.
 	for i: int in sub_control_count:
 		var child := get_sub_control(i)
-		child.custom_minimum_size.x = 0
+		child.set_deferred("custom_minimum_size:x", 0)
+		#child.custom_minimum_size.x = 0
 	
 	for i: int in sub_control_count:
 		var child := get_sub_control(i)
-		child.custom_minimum_size.x = parent_disposable_size * percent(i)
+		child.set_deferred("custom_minimum_size:x", parent_disposable_size * percent(i))
+		#child.custom_minimum_size.x = parent_disposable_size * percent(i)
 
 
 ## Ceil the scale.
@@ -135,6 +137,7 @@ func get_min_scale(id: int) -> int:
 
 
 func set_percentage_infimum() -> void:
+	print_debug("setting percentage infimum")
 	var res: Array[int] = []
 	for i: int in sub_control_count:
 		res.append(get_min_scale(i))

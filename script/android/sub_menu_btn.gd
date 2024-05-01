@@ -8,7 +8,8 @@ extends Control
 func _ready() -> void:
 	for i: HBoxContainer in get_children():
 		i.position = Vector2.ZERO
-		i.size = size
+		i.set_deferred("size", size)
+		#i.size = size
 
 
 func hide_children() -> void:
