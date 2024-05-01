@@ -84,6 +84,7 @@ func type_serializable(type_id: int) -> bool:
 
 ## 与 serialize_dict() 类似, 序列化数组
 func serialize_arr(arr: Array) -> Dictionary:
+	# Probably useful: Array::is_typed().
 	var type_id := arr.get_typed_builtin()
 	# object 之前的都是内置类型, 预期可以以合适的方式自动序列化和反序列化
 	assert(type_serializable(type_id))
