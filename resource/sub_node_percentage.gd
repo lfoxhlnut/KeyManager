@@ -2,22 +2,51 @@
 class_name SubNodePercentage
 extends Resource
 
+# It will emit -1 in set_percentage, i in set_percentage_by_id(i, ...)
+signal percentage_changed(id: int)
+
 # Node 的方法: _get_configuration_warnings
 # Object's method: notify_property_list_changed()
 # ↑ 可用于实现动态修改 hint string
 # TODO: 恢复默认值. 最小值的设置.
 #		最后一个部分可以设置为自动占据剩下的部分, 也可以手动设置成一个更小的数值
+#		percentage 和 infimum 的下标 0, 1, 2... 可以改名字
 
 
 var size: int = 3:
 	set(v):
 			size = clampi(v, 0, 100)
-			_infimum.resize(size)
-			_percentage.resize(size)
-			print_debug("in custom setter")
+			set_infimum()
+			set_percentage()
+			set_custom_name(custom_name)
+			print_debug("in custom setter of 'size'")
 			
 			notify_property_list_changed()
 			emit_changed()
+
+var use_custom_name := false
+
+## Activated only if use_custom_name is true.
+## Ignore parts whose index is greater than size.
+var custom_name: Array[String] = []: set = set_custom_name
+
+func set_custom_name(v: Array[String]) -> void:
+	custom_name.resize(size)
+	# 或许我应假定传入的参数都是合法的, 这样可以节省很多精力.
+	var s := mini(v.size(), size)
+	for i: int in s:
+		custom_name[i] = v[i]
+	# Fill vacancy with default.
+	for i: int in range(s, size):
+		custom_name[i] = i as String
+	
+	# Mapping.
+	_custom_name_map.clear()
+	for id: int in size:
+		_custom_name_map[custom_name[id]] = id
+
+# Map: custom_name(string) -> index(int).
+var _custom_name_map: Dictionary = {}
 
 ## Use set_percentage() to assign for percentage.
 ## Or use set_percentage_by_id() to modify value on specific index.
@@ -56,6 +85,7 @@ func _get_property_list() -> Array[Dictionary]:
 			type=TYPE_ARRAY,
 			usage=PROPERTY_USAGE_STORAGE,
 		},
+		# FIXME: custome..
 	]
 	
 	_percentage.resize(size)
@@ -69,6 +99,8 @@ func _get_property_list() -> Array[Dictionary]:
 			hint=PROPERTY_HINT_RANGE,
 			hint_string="0,100",
 		}
+		if should_use_custom_name():
+			d.name = "percentage/%s" % [custom_name[id]]
 		res.append(d)
 		
 		d = {
@@ -78,19 +110,31 @@ func _get_property_list() -> Array[Dictionary]:
 			hint=PROPERTY_HINT_RANGE,
 			hint_string="0,100",
 		}
+		
+		if should_use_custom_name():
+			d.name = "infimum/%s" % [custom_name[id]]
 		res.append(d)
 	return res
+
+
+func should_use_custom_name() -> bool:
+	return use_custom_name and not custom_name.is_empty()
+
+
+func get_id(property: String) -> int:
+	if should_use_custom_name():
+		return _custom_name_map[property as String] as int
+	else:
+		return int(property as String)
 
 
 func _get(property: StringName):
 	if property.begins_with("percentage/"):
 		property = property.trim_prefix("percentage/")
-		var id := int(property as String)
-		return percentage(id)
+		return percentage(get_id(property))
 	if property.begins_with("infimum/"):
 		property = property.trim_prefix("infimum/")
-		var id := int(property as String)
-		return infimum(id)
+		return infimum(get_id(property))
 	
 	return null
 
@@ -101,7 +145,7 @@ func _set(property: StringName, value: Variant) -> bool:
 	print_debug("accessing _set: ", property)
 	if property.begins_with("percentage/"):
 		property = property.trim_prefix("percentage/")
-		var id := int(property as String)
+		var id := get_id(property)
 		
 		set_percentage_by_id(id, value)
 		
@@ -111,7 +155,7 @@ func _set(property: StringName, value: Variant) -> bool:
 	
 	if property.begins_with("infimum/"):
 		property = property.trim_prefix("infimum/")
-		var id := int(property as String)
+		var id := get_id(property)
 		
 		set_infimum_by_id(id, value)
 		
@@ -130,8 +174,10 @@ func set_infimum_by_id(id: int, val: int) -> void:
 	set_infimum()
 
 
+## NOTE: Function set_percentage() will not be called automatically.
+## Param "arr" will be standardized by standardize_arr().
 func set_infimum(arr: Array[int] = _infimum) -> void:
-	assert(arr.size() == size)
+	arr = standardize_arr(arr.duplicate())
 	
 	# 其实理论上赋值者应保证 infimum 各项之和不超过 100.
 	# NOTE: 以后如果想允许赋值过程中临时的和超过 100, 这里得重写,
@@ -153,9 +199,14 @@ func get_infimum() -> Array[int]:
 func set_percentage_by_id(id: int, val: int) -> void:
 	_percentage[id] = val
 	set_percentage()
+	percentage_changed.emit(id)
 
 
-func set_percentage(arr: Array[int] = _percentage) -> void:
+## Signal "percentage_signal" will emit if whethet_emit is true.
+## Param "arr" will be standardized by standardize_arr().
+func set_percentage(arr: Array[int] = _percentage, whether_emit := false) -> void:
+	arr = standardize_arr(arr.duplicate())
+	
 	var upper_bound := disposable
 	
 	# Reallocate for each element. Give priority to smaller index elements.
@@ -173,6 +224,8 @@ func set_percentage(arr: Array[int] = _percentage) -> void:
 			_percentage[i] = upper_bound + infimum(i)
 			upper_bound = 0
 		assert(upper_bound >= 0)
+	if whether_emit:
+		percentage_changed.emit(-1)
 
 
 func percentage(id: int) -> int:
@@ -181,3 +234,13 @@ func percentage(id: int) -> int:
 
 func get_percentage() -> Array[int]:
 	return _percentage.duplicate()
+
+
+## Fill with 0 if arr.size() < size.
+## Ignore parts whose index is greater than size.
+func standardize_arr(arr: Array[int], s: int = size) -> Array[int]:
+	var ori_size := arr.size()
+	arr.resize(s)
+	for id: int in range(ori_size, s):
+		arr[id] = 0
+	return arr

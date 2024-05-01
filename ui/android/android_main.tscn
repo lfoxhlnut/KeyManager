@@ -11,8 +11,8 @@
 [sub_resource type="Resource" id="Resource_tyjth"]
 script = ExtResource("6_tho04")
 size = 3
-percentage = Array[int]([0, 0, 0])
-infimum = Array[int]([0, 0, 0])
+_percentage = Array[int]([0, 0, 0])
+_infimum = Array[int]([0, 0, 0])
 
 [node name="Main" type="Node"]
 script = ExtResource("1_powmy")
