@@ -38,14 +38,19 @@ var parent_node: HBoxContainer = null:
 		var to_call := set_percentage_infimum_by_id
 		# Disconnect previous signal link.
 		if parent_node:	# Only if it is not null.
+			# TODO
+			#parent_node.child_order_changed.disconnect()
 			for i: int in sub_control_count:
 				var child := get_sub_control(i)
 				var arr := child.minimum_size_changed.get_connections()
 				for d: Dictionary in arr:
 					if d.callable == to_call:
+						#child.renamed.disconnect()
 						child.minimum_size_changed.disconnect(to_call)
 		
 		parent_node = v
+		# TODO
+		#parent_node.child_order_changed.connect()
 		# Initalize if v is not null.
 		if not v:
 			return
@@ -58,6 +63,8 @@ var parent_node: HBoxContainer = null:
 			var child := get_sub_control(i)
 			if not child.is_connected("minimum_size_changed", to_call):
 				child.minimum_size_changed.connect(to_call.bind(i))
+				# TODO
+				#child.renamed.connect()
 		
 var sub_control_count: int:
 	get:
@@ -147,11 +154,11 @@ func set_percentage_infimum() -> void:
 func set_percentage_infimum_by_id(id: int) -> void:
 	percentage.set_infimum_by_id(id, get_min_scale(id))
 
-
+const parent_node_export_name := "Target HboxContainer"
 func _get_property_list() -> Array[Dictionary]:
 	var res: Array[Dictionary] = [
 		{
-			name="Target HboxContainer",
+			name=parent_node_export_name,
 			type=TYPE_OBJECT,
 			# Whether it should be storage? And what type if will be storage?
 			usage=PROPERTY_USAGE_STORAGE | PROPERTY_USAGE_EDITOR,
@@ -164,16 +171,34 @@ func _get_property_list() -> Array[Dictionary]:
 
 
 func _get(property: StringName):
-	if property == "Target HboxContainer":
+	if property == parent_node_export_name:
 		return parent_node
 	
 	return null
 
 
 func _set(property: StringName, value) -> bool:
-	if property == "Target HboxContainer":
-		if value is HBoxContainer:
+	if property == parent_node_export_name:
+		if value is HBoxContainer or value == null:
 			parent_node = value
 			return true
+		
+		print_debug("Error: unexpected value [%s] on setting %s" %
+			[value, parent_node_export_name]
+		)
 	
 	return false
+
+
+func _property_can_revert(property: StringName) -> bool:
+	if property == parent_node_export_name:
+		return true
+	
+	return false
+
+
+func _property_get_revert(property: StringName) -> Variant:
+	if property == parent_node_export_name:
+		return null
+	
+	return null
