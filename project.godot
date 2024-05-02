@@ -25,12 +25,10 @@ Global="*res://global/global.tscn"
 
 window/size/viewport_width=1080
 window/size/viewport_height=2400
-window/size/initial_position_type=0
-window/size/initial_position=Vector2i(600, 400)
+window/size/initial_position=Vector2i(1200, 1100)
 window/size/always_on_top=true
-window/size/window_width_override=540
-window/size/window_height_override=1200
-window/stretch/scale=0.5
+window/size/window_width_override=720
+window/size/window_height_override=1600
 window/handheld/orientation=1
 
 [filesystem]

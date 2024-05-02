@@ -4,15 +4,15 @@
 [ext_resource type="Script" path="res://script/content.gd" id="2_t4wwx"]
 [ext_resource type="PackedScene" uid="uid://k5r1oyboiqjk" path="res://ui/hud.tscn" id="3_vk3p4"]
 [ext_resource type="Script" path="res://script/android/android_menu.gd" id="4_qjvv8"]
-[ext_resource type="Script" path="res://script/android/menu_btn.gd" id="5_4s6ew"]
 [ext_resource type="Script" path="res://resource/sub_node_percentage.gd" id="6_tho04"]
 [ext_resource type="Script" path="res://script/android/sub_menu_btn.gd" id="7_swmk2"]
+[ext_resource type="PackedScene" uid="uid://dahjaq1efto" path="res://aid/allocate_space_for_children.tscn" id="8_bujed"]
 
-[sub_resource type="Resource" id="Resource_tyjth"]
+[sub_resource type="Resource" id="Resource_k5r1x"]
 script = ExtResource("6_tho04")
 size = 3
-_percentage = Array[int]([0, 0, 0])
-_infimum = Array[int]([0, 0, 0])
+_percentage = Array[int]([33, 33, 34])
+_infimum = Array[int]([12, 12, 12])
 
 [node name="Main" type="Node"]
 script = ExtResource("1_powmy")
@@ -70,22 +70,20 @@ anchor_bottom = 1.0
 offset_top = -78.0
 grow_horizontal = 2
 grow_vertical = 0
-script = ExtResource("5_4s6ew")
-percentage = SubResource("Resource_tyjth")
 
 [node name="SaveOp" type="Button" parent="HUD/Menu/MenuBtn"]
-custom_minimum_size = Vector2(124, 0)
+custom_minimum_size = Vector2(353.76, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 text = "Save operation"
 
 [node name="ItemOp" type="Button" parent="HUD/Menu/MenuBtn"]
-custom_minimum_size = Vector2(124, 0)
+custom_minimum_size = Vector2(353.76, 0)
 layout_mode = 2
 text = "Item operation"
 
 [node name="ClassOp" type="Button" parent="HUD/Menu/MenuBtn"]
-custom_minimum_size = Vector2(824, 0)
+custom_minimum_size = Vector2(364.48, 0)
 layout_mode = 2
 size_flags_horizontal = 8
 text = "Class operation"
@@ -105,15 +103,18 @@ anchor_bottom = 1.0
 
 [node name="Save" type="Button" parent="HUD/Menu/SubMenuBtn/SaveOperation"]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Save"
 
 [node name="Load" type="Button" parent="HUD/Menu/SubMenuBtn/SaveOperation"]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Load
 "
 
 [node name="EditSavePath" type="Button" parent="HUD/Menu/SubMenuBtn/SaveOperation"]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Edit save path"
 
 [node name="ItemOperation" type="HBoxContainer" parent="HUD/Menu/SubMenuBtn"]
@@ -124,10 +125,12 @@ offset_bottom = 109.0
 
 [node name="Add" type="Button" parent="HUD/Menu/SubMenuBtn/ItemOperation"]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Add a item"
 
 [node name="Manage" type="Button" parent="HUD/Menu/SubMenuBtn/ItemOperation"]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Manage items"
 
 [node name="ClassOperation" type="HBoxContainer" parent="HUD/Menu/SubMenuBtn"]
@@ -138,11 +141,17 @@ offset_bottom = 109.0
 
 [node name="Add" type="Button" parent="HUD/Menu/SubMenuBtn/ClassOperation"]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Add a class"
 
 [node name="Manage" type="Button" parent="HUD/Menu/SubMenuBtn/ClassOperation"]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Manage classes"
+
+[node name="AllocateSpaceForChildren" parent="HUD/Menu" node_paths=PackedStringArray("Target HboxContainer") instance=ExtResource("8_bujed")]
+percentage = SubResource("Resource_k5r1x")
+"Target HboxContainer" = NodePath("../MenuBtn")
 
 [connection signal="resized" from="Content/Title" to="Content" method="_on_title_resized"]
 [connection signal="tab_changed" from="Content/Title" to="Content" method="_on_title_tab_changed"]
